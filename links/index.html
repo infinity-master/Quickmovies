@@ -35,24 +35,19 @@
             color: yellow;
             margin: 15px 0;
         }
-        .ad-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
         .ad-space {
-            width: calc(50% - 10px);
-            max-width: 290px;
+            width: 100%;
             height: 120px;
             background-color: #e0e0e0;
+            margin: 10px 0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #666;
             font-size: 16px;
             border-radius: 5px;
+            overflow: hidden;
+            position: relative;
         }
         .loading-bar {
             width: 100%;
@@ -77,18 +72,26 @@
     </style>
 </head>
 <body>
-    <h1>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h1>
+     <h1>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h1>
     <div class="container">
         <h2>Preparing your download link...</h2>
         <p>Your link will be ready in <span class="countdown">10</span> seconds.</p>
-        <div class="loading-bar"><div id="progress"></div></div>
-        <div class="ad-container">
-            <div class="ad-space"><script type='text/javascript' src='//pl25956692.effectiveratecpm.com/5e/ab/77/5eab7767b0a463e511c91422f4acce1d.js'></script></div>
-            <div class="ad-space"><script async="async" data-cfasync="false" src="//pl25956740.effectiveratecpm.com/d8a9c6575959f9c617e57f42625db3fb/invoke.js"></script><div id="container-d8a9c6575959f9c617e57f42625db3fb"></div></div>
-            <div class="ad-space"><script async="async" data-cfasync="false" src="//pl25956740.effectiveratecpm.com/d8a9c6575959f9c617e57f42625db3fb/invoke.js"></script><div id="container-d8a9c6575959f9c617e57f42625db3fb"></div></div>
-            <div class="ad-space"><script async="async" data-cfasync="false" src="//pl25956740.effectiveratecpm.com/d8a9c6575959f9c617e57f42625db3fb/invoke.js"></script><div id="container-d8a9c6575959f9c617e57f42625db3fb"></div></div>
-        </div>
-    </div>
+        <div class="loading-bar"><div id="progress"></div></div><div class="ad-space" id="ad1"></div>
+    <div class="ad-space" id="ad2"></div>
+    <div class="ad-space" id="ad3"></div>
+    <div class="ad-space" id="ad4"></div>
+</div>
+
+<script>
+    function loadAds() {
+        document.getElementById('ad1').innerHTML = "<script type='text/javascript' src='//pl25956692.effectiveratecpm.com/5e/ab/77/5eab7767b0a463e511c91422f4acce1d.js'><\/script>";
+        document.getElementById('ad2').innerHTML = "<script async='async' data-cfasync='false' src='//pl25956740.effectiveratecpm.com/d8a9c6575959f9c617e57f42625db3fb/invoke.js'><\/script><div id='container-d8a9c6575959f9c617e57f42625db3fb'></div>";
+        document.getElementById('ad3').innerHTML = "<script async='async' data-cfasync='false' src='//pl25956740.effectiveratecpm.com/d8a9c6575959f9c617e57f42625db3fb/invoke.js'><\/script><div id='container-d8a9c6575959f9c617e57f42625db3fb'></div>";
+        document.getElementById('ad4').innerHTML = "<script async='async' data-cfasync='false' src='//pl25956740.effectiveratecpm.com/d8a9c6575959f9c617e57f42625db3fb/invoke.js'><\/script><div id='container-d8a9c6575959f9c617e57f42625db3fb'></div>";
+    }
+    
+    window.onload = loadAds;
+</script>
     <script>
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
