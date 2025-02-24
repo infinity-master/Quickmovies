@@ -1,0 +1,63 @@
+body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #121212;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #222222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: rgb(255,0,255);
+        }
+        h2 {
+            color: rgb(255,255,0);
+            font-size: 22px;
+        }
+        p {
+            color: #fff;
+        }
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: yellow;
+            margin: 15px 0;
+        }
+        .ad-space {
+            width: 100%;
+            height: 120px;
+            background-color: rgb(255,0,255);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .loading-bar {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .loading-bar div {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #ff3c00, #ff9a00);
+            transition: width 1s linear;
+        }
+        .error {
+            font-size: 20px;
+            font-weight: bold;
+            color: red;
+            margin-top: 20px;
+        }
