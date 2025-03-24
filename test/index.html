@@ -100,78 +100,101 @@
         let countdownTimer;
 
         function validateKey() {
-    fetch(githubApi, {
-        headers: { Authorization: `token ${apiKey}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-        let userData = JSON.parse(atob(data.content));
-        let foundUser = Object.values(userData).find(user => user.activationCode === activationKeyInput.value);
+            console.log("🔍 Checking activation key...");
 
-        if (!foundUser) {
-            errorMessage.textContent = "Invalid Activation Code!";
-            return;
-        }
-
-        if (foundUser.balance < 2) {
-            errorMessage.textContent = "Insufficient Funds!";
-            return;
-        }
-
-        fetch("https://growwsocial.github.io/Quickmovies/links/links.json")
+            fetch(githubApi, {
+                headers: { Authorization: `token ${apiKey}` }
+            })
             .then(res => res.json())
-            .then(linkData => {
-                if (!linkData[code]) {
-                    errorMessage.textContent = "Invalid Download Link!";
+            .then(data => {
+                console.log("✅ Fetched user data from GitHub API.");
+
+                let userData = JSON.parse(atob(data.content));
+                let foundUser = Object.values(userData).find(user => user.activationCode === activationKeyInput.value);
+
+                if (!foundUser) {
+                    errorMessage.textContent = "❌ Invalid Activation Code!";
+                    console.log("🚨 Error: Invalid Activation Code!");
                     return;
                 }
 
-                let downloadUrl = linkData[code];
+                if (foundUser.balance < 2) {
+                    errorMessage.textContent = "⚠️ Insufficient Funds!";
+                    console.log("🚨 Error: Insufficient Funds!");
+                    return;
+                }
 
-                // **Deduct funds before redirection**
-                let newBalance = foundUser.balance - 2;
-                userData[foundUser.mobile].balance = newBalance;
+                console.log("✅ Activation Key Verified!");
 
-                let transaction = {
-                    date: new Date().toLocaleString(),
-                    amount: "₹2",
-                    link: downloadUrl
-                };
+                fetch("https://growwsocial.github.io/Quickmovies/links/links.json")
+                    .then(res => res.json())
+                    .then(linkData => {
+                        console.log("✅ Download links fetched!");
 
-                if (!userData[foundUser.mobile].history) userData[foundUser.mobile].history = [];
-                userData[foundUser.mobile].history.push(transaction);
+                        if (!linkData[code]) {
+                            errorMessage.textContent = "❌ Invalid Download Link!";
+                            console.log("🚨 Error: Invalid Download Link!");
+                            return;
+                        }
 
-                fetch(`https://api.github.com/repos/infinity-master/Paid/contents/database.json`, {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `token ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: "Balance Deducted",
-                        content: btoa(JSON.stringify(userData)),
-                        sha: data.sha
+                        let downloadUrl = linkData[code];
+                        console.log("🔗 Found download link:", downloadUrl);
+
+                        // Deduct funds before redirection
+                        let newBalance = foundUser.balance - 2;
+                        userData[foundUser.mobile].balance = newBalance;
+
+                        let transaction = {
+                            date: new Date().toLocaleString(),
+                            amount: "₹2",
+                            link: downloadUrl
+                        };
+
+                        if (!userData[foundUser.mobile].history) userData[foundUser.mobile].history = [];
+                        userData[foundUser.mobile].history.push(transaction);
+
+                        console.log("💰 Deducting ₹2 and updating transaction history...");
+
+                        fetch(`https://api.github.com/repos/infinity-master/Paid/contents/database.json`, {
+                            method: "PUT",
+                            headers: {
+                                Authorization: `token ${apiKey}`,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                message: "Balance Deducted",
+                                content: btoa(JSON.stringify(userData)),
+                                sha: data.sha
+                            })
+                        })
+                        .then(() => {
+                            console.log("✅ Funds deducted successfully!");
+
+                            errorMessage.style.color = "green";
+                            errorMessage.textContent = "✅ Code Verified, Funds Deducted!";
+
+                            setTimeout(() => {
+                                console.log("📥 Starting download...");
+                                window.location.href = downloadUrl;
+                            }, 2000); // 2-second delay for confirmation
+                        })
+                        .catch(error => {
+                            errorMessage.textContent = "❌ Error updating transaction!";
+                            console.error("🚨 Error updating transaction:", error);
+                        });
                     })
-                })
-                .then(() => {
-                    // **Show confirmation message**
-                    errorMessage.style.color = "green";
-                    errorMessage.textContent = "Code Verified, Funds Deducted!";
-                    
-                    // **Start download after a short delay**
-                    setTimeout(() => {
-                        window.location.href = downloadUrl;
-                    }, 2000); // 2-second delay for message visibility
-                })
-                .catch(() => errorMessage.textContent = "Error processing transaction update!");
+                    .catch(error => {
+                        errorMessage.textContent = "❌ Error fetching download link!";
+                        console.error("🚨 Error fetching download link:", error);
+                    });
             })
-            .catch(() => errorMessage.textContent = "Error fetching download link!");
-    })
-    .catch(() => errorMessage.textContent = "Error fetching user data!");
-}
+            .catch(error => {
+                errorMessage.textContent = "❌ Error fetching user data!";
+                console.error("🚨 Error fetching user data:", error);
+            });
+        }
 
         function detectAdBlock() {
-            let adBlockDetected = false;
             let testAd = document.createElement("div");
             testAd.className = "adsbox";
             testAd.style.position = "absolute";
@@ -180,19 +203,11 @@
 
             setTimeout(() => {
                 if (testAd.offsetHeight === 0) {
-                    adBlockDetected = true;
+                    showAdblockPopup();
+                } else {
+                    startCountdown();
                 }
                 testAd.remove();
-
-                fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", { method: "HEAD", mode: "no-cors" })
-                    .then(() => {
-                        console.log("✅ No AdBlock detected.");
-                        startCountdown(); // Start the countdown
-                    })
-                    .catch(() => {
-                        console.log("🚨 AdBlock detected.");
-                        showAdblockPopup();
-                    });
             }, 500);
         }
 
@@ -200,35 +215,6 @@
             document.querySelector(".container").classList.add("blur");
             document.getElementById("adblockPopup").style.display = "block";
             clearInterval(countdownTimer);
-        }
-
-        function startCountdown() {
-            let countdown = 10;
-            countdownEl.textContent = countdown;
-
-            countdownTimer = setInterval(() => {
-                countdown--;
-                countdownEl.textContent = countdown;
-                progressBar.style.width = (100 - countdown * 10) + "%";
-
-                if (countdown === 0) {
-                    clearInterval(countdownTimer);
-                    autoDownload();
-                }
-            }, 1000);
-        }
-
-        function autoDownload() {
-            fetch("https://growwsocial.github.io/Quickmovies/links/links.json")
-                .then(res => res.json())
-                .then(linkData => {
-                    if (linkData[code]) {
-                        window.location.href = linkData[code]; // Auto-redirect to the download link
-                    } else {
-                        alert("Invalid Download Link!");
-                    }
-                })
-                .catch(() => alert("Error fetching download link!"));
         }
 
         window.onload = detectAdBlock;
