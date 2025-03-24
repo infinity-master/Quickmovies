@@ -1,163 +1,176 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Redirecting...</title>  
-    <link rel="stylesheet" href="https://quickmovies.hopto.org/links/style.css">  
-    <style>  
-       /* Enhanced Popup Styles */  
-.popup {  
-    position: fixed;  
-    top: 50%;  
-    left: 50%;  
-    transform: translate(-50%, -50%);  
-    background: #222222;  
-    padding: 20px;  
-    border-radius: 10px;  
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);  
-    text-align: center;  
-    display: none;  
-    z-index: 1000;  
-    width: 90%;  
-    max-width: 400px;  
-    border: 2px solid #ff3c00;  
-}  
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+    <meta charset="UTF-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>Redirecting...</title>    
+    <link rel="stylesheet" href="https://quickmovies.hopto.org/links/style.css">    
+    <style>    
+       /* Enhanced Popup Styles */    
+.popup {    
+    position: fixed;    
+    top: 50%;    
+    left: 50%;    
+    transform: translate(-50%, -50%);    
+    background: #222222;    
+    padding: 20px;    
+    border-radius: 10px;    
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);    
+    text-align: center;    
+    display: none;    
+    z-index: 1000;    
+    width: 90%;    
+    max-width: 400px;    
+    border: 2px solid #ff3c00;    
+}    
+    
+.popup h2 {    
+    margin: 0 0 10px;    
+    font-size: 22px;    
+    color: yellow;    
+}    
+    
+.popup p {    
+    color: #fff;    
+    font-size: 16px;    
+    margin-bottom: 15px;    
+}    
+    
+.popup input {    
+    width: 80%;    
+    padding: 8px;    
+    border: 2px solid #ff9a00;    
+    background: #121212;    
+    color: #fff;    
+    border-radius: 5px;    
+    text-align: center;    
+}    
+    
+.popup button {    
+    margin: 10px 5px;    
+    padding: 10px 15px;    
+    border: none;    
+    cursor: pointer;    
+    font-size: 14px;    
+    font-weight: bold;    
+    text-transform: uppercase;    
+    background: #ff3c00;    
+    color: #fff;    
+    border-radius: 5px;    
+    transition: 0.3s;    
+}    
+    
+.popup button:hover {    
+    background: #ff9a00;    
+}    
+    
+/* Blur Effect */    
+.blur {    
+    filter: blur(5px);    
+}    
+    </style>    
+</head>    
+<body>    
+    <h1>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h1>    
+    <div class="container">    
+        <h2>Preparing your download link...</h2>    
+        <p>Your link will be ready in <span class="countdown">10</span> seconds.</p>    
+        <div class="loading-bar"><div id="progress"></div></div>    
+        <button id="downloadBtn" style="display: none;">Click to Download</button>    
+        <div class="ad-space">    
+            <footer>     
+                <p>Powered By <span>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</span> <br>Developed by <span>Manoranjan Behera</span></p>     
+            </footer>    
+        </div>    
+    </div>         
+    
+    <!-- AdBlock Popup -->    
+    <div id="adblockPopup" class="popup">    
+        <h2>AdBlock Detected!</h2>    
+        <p>Please disable AdBlock to continue OR enter an activation key to start immediately.</p>    
+        <input type="text" id="activationKey" placeholder="Enter Activation Key">    
+        <button onclick="validateKey()">Submit Key</button>    
+        <p id="errorMessage" style="color:red;"></p>  
+    </div>    
+    
+    
+    <script src="https://testgvcc.socpanel.com"></script>
+    <script>    
+        const urlParams = new URLSearchParams(window.location.search);    
+        const code = urlParams.get('code');    
+        const githubApi = "https://api.github.com/repos/infinity-master/Paid/contents/database.json";    
+         
+        const countdownEl = document.querySelector(".countdown");    
+        const progressBar = document.getElementById("progress");    
+        const downloadBtn = document.getElementById("downloadBtn");    
+        const adblockPopup = document.getElementById("adblockPopup");    
+        const activationKeyInput = document.getElementById("activationKey");    
+        const errorMessage = document.getElementById("errorMessage");  
   
-.popup h2 {  
-    margin: 0 0 10px;  
-    font-size: 22px;  
-    color: yellow;  
-}  
+        let countdown = 10;    
+        let downloadLink = '';    
+        let countdownTimer;    
+    
+        function validateKey() {    
+            fetch(githubApi, {    
+                headers: { Authorization: `token ${apiKey}` }    
+            })    
+            .then(res => res.json())    
+            .then(data => {    
+                let userData = JSON.parse(atob(data.content));    
+                let foundUser = Object.values(userData).find(user => user.activationCode === activationKeyInput.value);    
   
-.popup p {  
-    color: #fff;  
-    font-size: 16px;  
-    margin-bottom: 15px;  
-}  
+                if (!foundUser) {    
+                    errorMessage.textContent = "Invalid Activation Code!";    
+                    return;    
+                }    
   
-.popup input {  
-    width: 80%;  
-    padding: 8px;  
-    border: 2px solid #ff9a00;  
-    background: #121212;  
-    color: #fff;  
-    border-radius: 5px;  
-    text-align: center;  
-}  
+                if (foundUser.balance < 2) {    
+                    errorMessage.textContent = "Insufficient Funds!";    
+                    return;    
+                }    
   
-.popup button {  
-    margin: 10px 5px;  
-    padding: 10px 15px;  
-    border: none;  
-    cursor: pointer;  
-    font-size: 14px;  
-    font-weight: bold;  
-    text-transform: uppercase;  
-    background: #ff3c00;  
-    color: #fff;  
-    border-radius: 5px;  
-    transition: 0.3s;  
-}  
+                fetch("https://growwsocial.github.io/Quickmovies/links/links.json")    
+                    .then(res => res.json())    
+                    .then(linkData => {    
+                        if (!linkData[code]) {    
+                            errorMessage.textContent = "Invalid Download Link!";    
+                            return;    
+                        }    
   
-.popup button:hover {  
-    background: #ff9a00;  
-}  
+                        let newBalance = foundUser.balance - 2;    
+                        userData[foundUser.mobile].balance = newBalance;    
   
-/* Blur Effect */  
-.blur {  
-    filter: blur(5px);  
-}  
-    </style>  
-</head>  
-<body>  
-    <h1>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h1>  
-    <div class="container">  
-        <h2>Preparing your download link...</h2>  
-        <p>Your link will be ready in <span class="countdown">10</span> seconds.</p>  
-        <div class="loading-bar"><div id="progress"></div></div>  
-        <button id="downloadBtn" style="display: none;">Click to Download</button>  
-        <div class="ad-space">  
-            <footer>   
-                <p>Powered By <span>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</span> <br>Developed by <span>Manoranjan Behera</span></p>   
-            </footer>  
-        </div>  
-    </div>       
+                        let transaction = {    
+                            date: new Date().toLocaleString(),    
+                            amount: "₹2",    
+                            link: window.location.href    
+                        };    
   
-    <!-- AdBlock Popup -->  
-    <div id="adblockPopup" class="popup">  
-        <h2>AdBlock Detected!</h2>  
-        <p>Please disable AdBlock to continue OR enter an activation key to start immediately.</p>  
-        <input type="text" id="activationKey" placeholder="Enter Activation Key">  
-        <button onclick="validateKey()">Submit Key</button>  
-        <p id="errorMessage" style="color:red;"></p>
-    </div>  
+                        if (!userData[foundUser.mobile].history) userData[foundUser.mobile].history = [];    
+                        userData[foundUser.mobile].history.push(transaction);    
   
+                        fetch(`https://api.github.com/repos/infinity-master/Paid/contents/database.json`, {    
+                            method: "PUT",    
+                            headers: {    
+                                Authorization: `token ${apiKey}`,    
+                                "Content-Type": "application/json"    
+                            },    
+                            body: JSON.stringify({    
+                                message: "Balance Deducted",    
+                                content: btoa(JSON.stringify(userData)),    
+                                sha: data.sha    
+                            })    
+                        })    
+                        .then(() => window.location.href = linkData[code])    
+                        .catch(() => errorMessage.textContent = "Error processing request!");    
+                    })    
+                    .catch(() => errorMessage.textContent = "Error fetching download link!");    
+            })    
+            .catch(() => errorMessage.textContent = "Error fetching user data!");    
+        }    
   
-  <script src="https://testgvcc.socpanel.com"></script>
-    <script>  
-        const urlParams = new URLSearchParams(window.location.search);  
-        const code = urlParams.get('code');  
-        const githubApi = "https://api.github.com/repos/infinity-master/Paid/contents/database.json";  
-        
-        const countdownEl = document.querySelector(".countdown");  
-        const progressBar = document.getElementById("progress");  
-        const downloadBtn = document.getElementById("downloadBtn");  
-        const adblockPopup = document.getElementById("adblockPopup");  
-        const activationKeyInput = document.getElementById("activationKey");  
-        const errorMessage = document.getElementById("errorMessage");
-
-        let countdown = 10;  
-        let downloadLink = '';  
-        let countdownTimer;  
-  
-        function validateKey() {  
-            fetch(githubApi, {  
-                headers: { Authorization: `token ${apiKey}` }  
-            })  
-            .then(res => res.json())  
-            .then(data => {  
-                let userData = JSON.parse(atob(data.content));  
-                let foundUser = Object.values(userData).find(user => user.activationCode === activationKeyInput.value);  
-
-                if (!foundUser) {  
-                    errorMessage.textContent = "Invalid Activation Code!";  
-                    return;  
-                }  
-
-                if (foundUser.balance < 2) {  
-                    errorMessage.textContent = "Insufficient Funds!";  
-                    return;  
-                }  
-
-                fetch(`https://api.github.com/repos/infinity-master/Paid/contents/database.json`, {
-    method: "PUT",
-    headers: {
-        Authorization: `token ${apiKey}`,
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        message: "Balance Deducted",
-        content: btoa(JSON.stringify(userData)),
-        sha: data.sha
-    })
-})
-.then(() => {
-    fetch("https://quickmovies.hopto.org/links/links.json")
-        .then(res => res.json())
-        .then(linkData => {
-            if (!linkData[code]) {
-                errorMessage.textContent = "Invalid Download Link!";
-                return;
-            }
-
-            window.location.href = linkData[code]; // Redirect to download link
-        })
-        .catch(() => errorMessage.textContent = "Error fetching download link!");
-})
-.catch(() => errorMessage.textContent = "Error processing request!");
-
- function detectAdBlock() {
+        function detectAdBlock() {
     let adBlockDetected = false;
 
     // Create a test element to check if ads are hidden
@@ -204,30 +217,12 @@ function startCountdown() {
         if (countdown === 0) {
             clearInterval(countdownTimer);
             downloadBtn.style.display = "block";
-            triggerDownload(); // Auto-start the download
         }
     }, 1000);
 }
 
-function triggerDownload() {
-    fetch("https://quickmovies.hopto.org/links/links.json")
-        .then(res => res.json())
-        .then(linkData => {
-            if (!linkData[code]) {
-                alert("Invalid Download Link!");
-                return;
-            }
-
-            window.location.href = linkData[code]; // Redirect to download link
-        })
-        .catch(() => alert("Error fetching download link!"));
-}
-
-// Also trigger download when the button is clicked manually
-downloadBtn.addEventListener("click", triggerDownload);
-
 // Run detection when the page loads
 window.onload = detectAdBlock;
-    </script>  
-</body>  
-</html>
+    </script>    
+</body>    
+</html>  
