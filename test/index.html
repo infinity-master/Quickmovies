@@ -130,45 +130,32 @@
                     return;  
                 }  
 
-                fetch("https://quickmovies.hopto.org/links/links.json")  
-                    .then(res => res.json())  
-                    .then(linkData => {  
-                        if (!linkData[code]) {  
-                            errorMessage.textContent = "Invalid Download Link!";  
-                            return;  
-                        }  
+                fetch(`https://api.github.com/repos/infinity-master/Paid/contents/database.json`, {
+    method: "PUT",
+    headers: {
+        Authorization: `token ${apiKey}`,
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        message: "Balance Deducted",
+        content: btoa(JSON.stringify(userData)),
+        sha: data.sha
+    })
+})
+.then(() => {
+    fetch("https://quickmovies.hopto.org/links/links.json")
+        .then(res => res.json())
+        .then(linkData => {
+            if (!linkData[code]) {
+                errorMessage.textContent = "Invalid Download Link!";
+                return;
+            }
 
-                        let newBalance = foundUser.balance - 2;  
-                        userData[foundUser.mobile].balance = newBalance;  
-
-                        let transaction = {  
-                            date: new Date().toLocaleString(),  
-                            amount: "₹2",  
-                            link: window.location.href  
-                        };  
-
-                        if (!userData[foundUser.mobile].history) userData[foundUser.mobile].history = [];  
-                        userData[foundUser.mobile].history.push(transaction);  
-
-                        fetch(`https://api.github.com/repos/infinity-master/Paid/contents/database.json`, {  
-                            method: "PUT",  
-                            headers: {  
-                                Authorization: `token ${apiKey}`,  
-                                "Content-Type": "application/json"  
-                            },  
-                            body: JSON.stringify({  
-                                message: "Balance Deducted",  
-                                content: btoa(JSON.stringify(userData)),  
-                                sha: data.sha  
-                            })  
-                        })  
-                        .then(() => window.location.href = linkData[code])  
-                        .catch(() => errorMessage.textContent = "Error processing request!");  
-                    })  
-                    .catch(() => errorMessage.textContent = "Error fetching download link!");  
-            })  
-            .catch(() => errorMessage.textContent = "Error fetching user data!");  
-        }  
+            window.location.href = linkData[code]; // Redirect to download link
+        })
+        .catch(() => errorMessage.textContent = "Error fetching download link!");
+})
+.catch(() => errorMessage.textContent = "Error processing request!");
 
  function detectAdBlock() {
     let adBlockDetected = false;
@@ -217,9 +204,27 @@ function startCountdown() {
         if (countdown === 0) {
             clearInterval(countdownTimer);
             downloadBtn.style.display = "block";
+            triggerDownload(); // Auto-start the download
         }
     }, 1000);
 }
+
+function triggerDownload() {
+    fetch("https://quickmovies.hopto.org/links/links.json")
+        .then(res => res.json())
+        .then(linkData => {
+            if (!linkData[code]) {
+                alert("Invalid Download Link!");
+                return;
+            }
+
+            window.location.href = linkData[code]; // Redirect to download link
+        })
+        .catch(() => alert("Error fetching download link!"));
+}
+
+// Also trigger download when the button is clicked manually
+downloadBtn.addEventListener("click", triggerDownload);
 
 // Run detection when the page loads
 window.onload = detectAdBlock;
