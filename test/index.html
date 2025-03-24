@@ -128,17 +128,14 @@
 
                 let downloadUrl = linkData[code];
 
-                // **Redirect first**
-                window.location.href = downloadUrl;
-
-                // **Deduct funds & save transaction history in background**
+                // **Deduct funds before redirection**
                 let newBalance = foundUser.balance - 2;
                 userData[foundUser.mobile].balance = newBalance;
 
                 let transaction = {
                     date: new Date().toLocaleString(),
                     amount: "₹2",
-                    link: window.location.href
+                    link: downloadUrl
                 };
 
                 if (!userData[foundUser.mobile].history) userData[foundUser.mobile].history = [];
@@ -155,7 +152,18 @@
                         content: btoa(JSON.stringify(userData)),
                         sha: data.sha
                     })
-                }).catch(() => console.log("Error processing transaction update."));
+                })
+                .then(() => {
+                    // **Show confirmation message**
+                    errorMessage.style.color = "green";
+                    errorMessage.textContent = "Code Verified, Funds Deducted!";
+                    
+                    // **Start download after a short delay**
+                    setTimeout(() => {
+                        window.location.href = downloadUrl;
+                    }, 2000); // 2-second delay for message visibility
+                })
+                .catch(() => errorMessage.textContent = "Error processing transaction update!");
             })
             .catch(() => errorMessage.textContent = "Error fetching download link!");
     })
