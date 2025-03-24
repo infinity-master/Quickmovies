@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <link rel="stylesheet" href="https://quickmovies.hopto.org/links/style.css">
+    <style>
+       /* Enhanced Popup Styles */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #222222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    display: none;
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    border: 2px solid #ff3c00;
+}
+
+.popup h2 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    color: yellow;
+}
+
+.popup p {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.popup input {
+    width: 80%;
+    padding: 8px;
+    border: 2px solid #ff9a00;
+    background: #121212;
+    color: #fff;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.popup button {
+    margin: 10px 5px;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: #ff3c00;
+    color: #fff;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.popup button:hover {
+    background: #ff9a00;
+}
+
+/* Blur Effect */
+.blur {
+    filter: blur(5px);
+}
+    </style>
+</head>
+<body>
+    <h1>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h1>
+    <div class="container">
+        <h2>Preparing your download link...</h2>
+        <p>Your link will be ready in <span class="countdown">10</span> seconds.</p>
+        <div class="loading-bar"><div id="progress"></div></div>
+        <button id="downloadBtn" style="display: none;">Click to Download</button>
+        <div class="ad-space">
+            <footer> 
+                <p>Powered By <span>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</span> <br>Developed by <span>Manoranjan Behera</span></p> 
+            </footer>
+        </div>
+    </div>     
+
+    <!-- AdBlock Popup -->
+    <div id="adblockPopup" class="popup">
+        <h2>AdBlock Detected!</h2>
+        <p>Please disable AdBlock to continue OR enter an activation key to start immediately.</p>
+        <input type="text" id="activationKey" placeholder="Enter Activation Key">
+        <button onclick="validateKey()">Submit Key</button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const apiUrl = atob("aHR0cHM6Ly9ncm93d3NvY2lhbC5naXRodWIuaW8vUXVpY2ttb3ZpZXMvbGlua3MvbGlua3MuanNvbg==");
+
+        const countdownEl = document.querySelector(".countdown");
+        const progressBar = document.getElementById("progress");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const adblockPopup = document.getElementById("adblockPopup");
+        const activationKeyInput = document.getElementById("activationKey");
+
+        let countdown = 10;
+        let downloadLink = '';
+        let activationKey = "QUICKMOVIES2024"; // ✅ Change this to your real activation key
+        let countdownTimer;
+
+        function startCountdown() {
+            if (adblockPopup.style.display === "block") {
+                return; // ✅ Stop countdown if AdBlock popup is active
+            }
+
+            countdownTimer = setInterval(() => {
+                countdown--;
+                countdownEl.textContent = countdown;
+                progressBar.style.width = ((10 - countdown) / 10) * 100 + '%';
+
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    if (!code) {
+                        window.location.href = "404.html"; // Redirect if code is missing
+                    } else {
+                        fetch(apiUrl)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data[code]) {
+                                    downloadLink = data[code];
+                                    downloadBtn.style.display = "block";
+                                    downloadBtn.onclick = () => window.location.href = downloadLink;
+                                } else {
+                                    window.location.href = "404.html"; // Redirect if code is invalid
+                                }
+                            })
+                            .catch(() => {
+                                window.location.href = "404.html"; // Redirect on API error
+                            });
+                    }
+                }
+            }, 1000);
+        }
+
+        function detectAdBlock() {
+            let adBlockDetected = false;
+
+            fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", { method: "HEAD", mode: "no-cors" })
+                .then(() => {
+                    console.log("AdBlock not detected.");
+                    startCountdown(); // ✅ Start countdown only if AdBlock is NOT detected
+                })
+                .catch(() => {
+                    adBlockDetected = true;
+                    showAdblockPopup();
+                });
+
+            const testAd = document.createElement("div");
+            testAd.innerHTML = "&nbsp;";
+            testAd.className = "adsbox";
+            testAd.style.position = "absolute";
+            testAd.style.visibility = "hidden";
+            document.body.appendChild(testAd);
+
+            setTimeout(() => {
+                if (testAd.offsetHeight === 0) {
+                    adBlockDetected = true;
+                    showAdblockPopup();
+                }
+                testAd.remove();
+            }, 100);
+        }
+
+        function showAdblockPopup() {
+            document.querySelector(".container").classList.add("blur");
+            adblockPopup.style.display = "block";
+            clearInterval(countdownTimer); // ✅ Pause countdown when AdBlock popup appears
+        }
+
+        function validateKey() {
+            if (activationKeyInput.value === activationKey) {
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data[code]) {
+                            window.location.href = data[code]; // ✅ Start download immediately
+                        } else {
+                            alert("Invalid Code!");
+                        }
+                    })
+                    .catch(() => {
+                        alert("Error fetching download link!");
+                    });
+            } else {
+                alert("Invalid Activation Key!");
+            }
+        }
+
+        detectAdBlock(); // ✅ AdBlock check runs first
+
+    </script>
+</body>
+</html>
