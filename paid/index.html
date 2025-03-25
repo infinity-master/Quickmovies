@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Download</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #111, #222);
             color: white;
             text-align: center;
             padding: 20px;
@@ -15,28 +17,32 @@
         .container {
             max-width: 400px;
             margin: auto;
-            background: #1e1e1e;
+            background: #1c1c1c;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 255, 255, 0.4);
         }
         button {
-            display: block;
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 12px 0;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
         .buy-btn {
-            background-color: #28a745;
+            background: linear-gradient(45deg, #28a745, #19d863);
             color: white;
         }
         .ads-btn {
-            background-color: #dc3545;
+            background: linear-gradient(45deg, #dc3545, #ff4d6d);
             color: white;
+        }
+        button:active {
+            transform: scale(0.98);
         }
         .popup {
             display: none;
@@ -44,19 +50,21 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #333;
+            background: #2a2a2a;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(255, 255, 0, 0.4);
         }
         .popup input {
-            width: 80%;
+            width: 90%;
             padding: 10px;
             margin-top: 10px;
             font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
         }
         .popup button {
-            margin-top: 10px;
+            margin-top: 12px;
         }
         .close-btn {
             background-color: #ff4747;
@@ -75,67 +83,108 @@
     <div id="popup" class="popup">
         <h3>Enter Activation Code</h3>
         <input type="text" id="activationCode" placeholder="Enter Code">
-        <button onclick="verifyCode()">Verify & Purchase</button>
+        <button id="verifyBtn" onclick="verifyCode()">Verify & Purchase</button>
         <button class="close-btn" onclick="closePopup()">Cancel</button>
     </div>
-    
     <script src="https://testgvcc.socpanel.com/"></script>
-
     <script>
         const githubDatabaseURL = "https://raw.githubusercontent.com/infinity-master/Paid/refs/heads/main/database.json";
-        const githubHistoryRepo = "https://api.github.com/repos/infinity-master/Paid/contents/transaction-history/";
-        const githubDatabaseRepo = "https://api.github.com/repos/infinity-master/Paid/contents/database.json";
-        
+const githubHistoryRepo = "https://api.github.com/repos/infinity-master/Paid/contents/transaction-history/";
+const githubDatabaseRepo = "https://api.github.com/repos/infinity-master/Paid/contents/database.json";
+const userCodeJsonURL = "https://growwsocial.github.io/Quickmovies/links/links.json";
 
-        // Extract code from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userCode = urlParams.get("code");
+const urlParams = new URLSearchParams(window.location.search);
+const userCode = urlParams.get("code");
 
-        function showPopup() {
-            document.getElementById("popup").style.display = "block";
-        }
+function showPopup() {
+    document.getElementById("popup").style.display = "block";
+}
 
-        function closePopup() {
-            document.getElementById("popup").style.display = "none";
-        }
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
 
-        function redirectToAds() {
-            if (userCode) {
-                window.location.href = `https://quickmovies.hopto.org/ads/?code=${userCode}`;
+// Function to check if userCode exists in the JSON file
+function checkUserCodeExists(callback) {
+    fetch(userCodeJsonURL)
+        .then(response => response.json())
+        .then(data => {
+            if (data[userCode]) {
+                callback(true, data[userCode]); // Code exists, return the download link
             } else {
-                alert("Error: Invalid link format!");
+                alert("Error: Invalid or expired link!");
+                callback(false, null);
             }
+        })
+        .catch(error => {
+            alert("Error checking the user code. Try again later.");
+            console.error(error);
+            callback(false, null);
+        });
+}
+
+function redirectToAds() {
+    if (!userCode) {
+        alert("Error: Invalid link format!");
+        return;
+    }
+
+    checkUserCodeExists((exists) => {
+        if (exists) {
+            window.location.href = `https://quickmovies.hopto.org/ads/?code=${userCode}`;
+        }
+    });
+}
+
+function verifyCode() {
+    let verifyBtn = document.getElementById("verifyBtn");
+    verifyBtn.innerText = "Verifying...";
+    verifyBtn.disabled = true;
+
+    let code = document.getElementById("activationCode").value.trim();
+    if (code === "") {
+        alert("Please enter an activation code.");
+        verifyBtn.innerText = "Verify & Purchase";
+        verifyBtn.disabled = false;
+        return;
+    }
+
+    checkUserCodeExists((exists) => {
+        if (!exists) {
+            verifyBtn.innerText = "Verify & Purchase";
+            verifyBtn.disabled = false;
+            return;
         }
 
-        function verifyCode() {
-            let code = document.getElementById("activationCode").value.trim();
-            if (code === "") {
-                alert("Please enter an activation code.");
-                return;
-            }
-
-            fetch(githubDatabaseURL)
-                .then(response => response.json())
-                .then(data => {
-                    let user = Object.values(data).find(user => user.activationCode === code);
-                    if (user) {
-                        if (user.balance >= 1) {
-                            deductBalance(user.mobile, user.balance);
-                        } else {
-                            alert("Insufficient balance!");
-                        }
+        fetch(githubDatabaseURL)
+            .then(response => response.json())
+            .then(data => {
+                let user = Object.values(data).find(user => user.activationCode === code);
+                if (user) {
+                    if (user.balance >= 1) {
+                        deductBalance(user.mobile, user.balance);
                     } else {
-                        alert("Invalid activation code!");
+                        alert("Insufficient balance!");
+                        verifyBtn.innerText = "Verify & Purchase";
+                        verifyBtn.disabled = false;
                     }
-                })
-                .catch(error => {
-                    alert("Error verifying code. Try again later.");
-                    console.error(error);
-                });
-        }
+                } else {
+                    alert("Invalid activation code!");
+                    verifyBtn.innerText = "Verify & Purchase";
+                    verifyBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                alert("Error verifying code. Try again later.");
+                console.error(error);
+                verifyBtn.innerText = "Verify & Purchase";
+                verifyBtn.disabled = false;
+            });
+    });
+}
 
-        function deductBalance(mobile, balance) {
-    let newBalance = balance - 1;  // Deduct ₹1
+function deductBalance(mobile, balance) {
+    let newBalance = balance - 1;
 
     fetch(githubDatabaseRepo, {
         method: "GET",
@@ -151,7 +200,7 @@
             return;
         }
 
-        data[mobile].balance = newBalance;  // Update balance
+        data[mobile].balance = newBalance;
 
         let updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
@@ -164,13 +213,13 @@
             body: JSON.stringify({
                 message: `Deducted ₹1 from ${mobile}'s balance`,
                 content: updatedContent,
-                sha: fileData.sha // Ensure correct file update
+                sha: fileData.sha
             })
         });
     })
     .then(response => {
         if (response.ok) {
-            saveTransactionHistory(mobile); // Proceed to save history
+            saveTransactionHistory(mobile);
         } else {
             alert("Failed to update balance!");
         }
@@ -180,59 +229,44 @@
         console.error(error);
     });
 }
-        function saveTransactionHistory(mobile) {
-    const transaction = {
+
+function saveTransactionHistory(mobile) {
+    let transaction = {
         url: window.location.href,
         date: new Date().toISOString().split("T")[0],
         time: new Date().toLocaleTimeString(),
         amount: 1
     };
 
-    const historyFile = `${mobile}.json`;
-    const fileUrl = `${githubHistoryRepo}${historyFile}`;
+    let historyFile = `${mobile}.json`;
+    let fileUrl = `${githubHistoryRepo}${historyFile}`;
 
     fetch(fileUrl, {
         method: "GET",
         headers: { Authorization: `token ${apiKey}` }
     })
     .then(response => {
-        if (response.status === 404) {
-            return { transactions: [] };  // Create a new history file
-        }
-        return response.json().then(fileData => {
-            const content = atob(fileData.content);
-            return { transactions: JSON.parse(content).transactions, sha: fileData.sha };
-        });
+        if (response.status === 404) return { transactions: [] };
+        return response.json().then(fileData => ({
+            transactions: JSON.parse(atob(fileData.content)).transactions,
+            sha: fileData.sha
+        }));
     })
     .then(existingData => {
         existingData.transactions.push(transaction);
-        const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify({ transactions: existingData.transactions }, null, 2))));
-
-        let bodyData = {
-            message: "Updated transaction history",
-            content: updatedContent
-        };
-
-        if (existingData.sha) {
-            bodyData.sha = existingData.sha;  // Only include sha if the file exists
-        }
-
         return fetch(fileUrl, {
             method: "PUT",
-            headers: { 
-                "Authorization": `token ${apiKey}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(bodyData)
+            headers: { "Authorization": `token ${apiKey}` },
+            body: JSON.stringify({ 
+                message: "Updated transaction history",
+                content: btoa(JSON.stringify({ transactions: existingData.transactions }, null, 2)),
+                sha: existingData.sha
+            })
         });
     })
     .then(() => {
-        alert("Transaction successful! Redirecting...");
-        if (userCode) {
-            window.location.href = `https://quickmovies.hopto.org/fast/?code=${userCode}`;
-        } else {
-            alert("Error: Invalid link format!");
-        }
+        document.getElementById("verifyBtn").innerText = "Redirecting...";
+        window.location.href = `https://quickmovies.hopto.org/fast/?code=${userCode}`;
     })
     .catch(error => {
         alert("Error saving transaction history.");
