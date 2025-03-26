@@ -183,7 +183,7 @@
             document.body.innerHTML = `
                 <div style="text-align:center; font-family: 'Inter', sans-serif; color: white; background: #121212; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
                     <h2>Access Denied!</h2>
-                    <p>Your User ID must be exactly 5 uppercase letters (A-Z).</p>
+                    <p>This page is allowed only for authenticated users.</p>
                     <a href="https://quickmovies.sytes.net" style="color: #0A84FF; text-decoration: none; font-weight: bold;">Please login and try again</a>
                 </div>
             `;
@@ -199,7 +199,7 @@
 
         // Ensure User ID is exactly 5 capital letters
         if (!/^[A-Z]{5}$/.test(user)) {
-            showPopup("errorPopup", "Your User ID must be exactly 5 uppercase letters (A-Z).");
+            showPopup("errorPopup", "This page is allowed only for authenticated users.");
             return;
         }
 
