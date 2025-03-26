@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+    <link rel="stylesheet" href="dashstyle.css">
+</head>
+<body>
+
+    <!-- Login Box -->
+   <div id="loginBox" class="container">
+    <h2>Login</h2>
+    <input type="text" id="userMobile" placeholder="Enter Mobile Number">   
+    <div class="password-container">
+        <input type="password" id="userPIN" placeholder="Enter PIN">
+<i class="ri-eye-off-line toggle-password" onclick="togglePassword('userPIN', this)"></i>
+         <p><a href="forget-password.html" class="forgetbtn">Forgot PIN?</a></p>
+    </div>
+   <br>    
+    <button onclick="login()">Login</button>
+    <p style="color: gray">New user? <a href="#" class="regbtn" onclick="toggleForms()">Register here</a></p>
+    <p id="errorMessage" style="color: red; display: none;">Invalid Login!</p>
+</div>
+
+    <!-- Registration Box -->
+    <div id="registerBox" class="container hidden">
+    <h2>Registration</h2>
+    <input type="text" id="regMobile" placeholder="Enter Mobile Number" maxlength="10">
+    
+    <div class="password-container">
+        <input type="password" id="regPIN" placeholder="Create PIN" maxlength="4">
+        <i class="ri-eye-off-line toggle-password" onclick="togglePassword('regPIN', this)"></i>
+    </div>    
+    <div class="password-container">
+        <input type="text" id="activationCode" placeholder="Enter Activation Code" maxlength="5" oninput="this.value = this.value.toUpperCase().slice(0,5)">
+        <i class="ri-refresh-line refresh-icon" onclick="generateActivationCode()"></i>
+    </div>
+    <button onclick="register()">Register</button>
+    <p style="color: gray">Already have an account?<a href="#" class="regbtn" onclick="toggleForms()"> Login here</a></p>
+</div>
+
+    <!-- Transaction Popup -->
+    <div id="transactionPopup" class="popup hidden">
+        <div class="popup-header">
+            <h3>Transaction History</h3>
+            <i class="ri-close-line close-btn" onclick="closeTransactionPopup()"></i>
+        </div>
+        <div class="popup-content" id="transactionList">
+            <p>Loading transactions...</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="container hidden">
+        <header id="noAuthHeader">
+            <a class="menubtn" onclick="noAuthMenuToggle();">
+                <i class="ri-menu-line" id="menuIcon"></i>
+            </a>
+            <div class="navcontainer">
+                <div class="row align-items-center">
+                    <div class="col-lg-auto">
+                        <h2>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h2>
+                    </div>
+                    <h2 class="balance">₹<span id="walletBalance"></span></h2>
+                    <div class="col-lg">
+                        <ul class="hdMn" id="navMenu">
+                            <li class="hdMnIt"><a class="hdMnLi select">Home</a></li>
+                            <li class="hdMnIt"><a class="hdMnLi" onclick="AddMoney()">Add Money</a></li>
+                            <li class="hdMnIt"><a class="hdMnLi" onclick="settings()">Settings</a></li>
+                            <li class="hdMnIt"><a class="hdMnLi" onclick="showTransactionHistory()">Transaction History</a></li>
+                            
+                            <li class="hdMnIt"><a class="hdMnLi" onclick="deleteAccount()">Delete Account</a></li>
+                            <li class="hdMnIt"><a class="hdMnLi" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Activation Code Section -->
+        <div class="activation-container">
+            <p class="title"><strong>Activation Code</strong></p>
+            <div class="activation-box">
+                <span id="activationCodeText">ABCD-1234-EFGH</span>
+                <i id="copyIcon" class="ri-file-copy-line" onclick="copyCode()"></i>
+            </div>
+        </div>
+        <p id="copyMessage"></p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://testgvcc.socpanel.com"></script>
+    <script>
+        const repoOwner = "infinity-master";
+        const repoName = "Paid";
+        const filePath = "database.json";
+        let userData = {};
+
+        async function fetchData() {
+            const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+            try {
+                let response = await fetch(url, { headers: { Authorization: `token ${apiKey}` } });
+                let data = await response.json();
+                if (data.content) {
+                    return JSON.parse(atob(data.content)); // Decode and parse data
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                return {};
+            }
+        }
+
+async function updateGitHub(data) {
+            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+            let existingFile = await fetch(apiUrl, { headers: { Authorization: `token ${apiKey}` } }).then(res => res.json());
+
+            let updatedContent = btoa(JSON.stringify(data, null, 2));
+            let payload = {
+                message: "Updated user data",
+                content: updatedContent,
+                sha: existingFile.sha
+            };
+
+            try {
+                await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+                console.log("GitHub data updated successfully!");
+            } catch (error) {
+                console.error("Error updating GitHub:", error);
+            }
+        }
+
+        async function login() {
+            let mobile = document.getElementById("userMobile").value.trim();
+            let pin = document.getElementById("userPIN").value.trim();
+            let users = await fetchData();
+
+            if (!users[mobile]) {
+                showError("User not found!");
+                return;
+            }
+
+            if (users[mobile].pin !== pin) {
+                showError("Incorrect PIN!");
+                return;
+            }
+
+            userData = users[mobile];
+            localStorage.setItem("loggedInUser", JSON.stringify(userData));
+            showDashboard();
+        }
+
+        function showError(message) {
+            let errorMsg = document.getElementById("errorMessage");
+            errorMsg.innerText = message;
+            errorMsg.style.display = "block";
+        }
+
+        function showDashboard() {
+            document.getElementById("activationCodeText").innerText = userData.activationCode;
+
+            function updateBalance() {
+                fetchData().then(users => {
+                    if (users[userData.mobile]) {
+                        userData.balance = users[userData.mobile].balance;
+                        document.getElementById("walletBalance").innerText = userData.balance;
+                    }
+                });
+            }
+
+            updateBalance();
+            setInterval(updateBalance, 2000);
+
+            document.getElementById("dashboard").classList.remove("hidden");
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("registerBox").classList.add("hidden");
+            document.getElementById("errorMessage").style.display = "none";
+        }
+
+        function toggleForms() {
+            document.getElementById("registerBox").classList.toggle("hidden");
+            document.getElementById("loginBox").classList.toggle("hidden");
+        }
+
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            document.getElementById("dashboard").classList.add("hidden");
+            document.getElementById("loginBox").classList.remove("hidden");
+        }
+
+        function AddMoney() {
+            let activationCode = document.getElementById("activationCodeText").innerText;
+            window.location.href = `https://quickmovies.sytes.net/payment/?User=${activationCode}`;
+        }
+
+function settings() {
+            let activationCode = document.getElementById("activationCodeText").innerText;
+            window.location.href = `https://quickmovies.sytes.net/settings?User=${activationCode}`;
+        }
+
+        window.onload = function () {
+            let savedUser = localStorage.getItem("loggedInUser");
+            if (savedUser) {
+                userData = JSON.parse(savedUser);
+                showDashboard();
+            }
+        };
+    </script>
+    <!-- External Scripts -->
+    <script src="https://quickmovies.sytes.net/generate-actcode.js"></script>
+    <script src="https://quickmovies.sytes.net/delete-ac.js"></script>
+    <script src="https://quickmovies.sytes.net/transaction.js"></script>
+    <script src="https://quickmovies.sytes.net/register.js"></script>
+    <script src="https://quickmovies.sytes.net/copy-code.js"></script>
+    <script src="https://quickmovies.sytes.net/pas-eye.js"></script>
+    <script src="https://quickmovies.sytes.net/menu-btn.js"></script>
+
+</body>
+</html>
