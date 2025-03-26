@@ -222,51 +222,55 @@
     }
 
     function verifyCode() {
-        let verifyBtn = document.getElementById("verifyBtn");
-        verifyBtn.innerText = "Verifying...";
-        verifyBtn.disabled = true;
+    let verifyBtn = document.getElementById("verifyBtn");
+    verifyBtn.innerText = "Verifying...";
+    verifyBtn.disabled = true;
 
-        let code = document.getElementById("activationCode").value.trim();
-        if (code === "") {
-            alert("Please enter an activation code.");
+    let code = document.getElementById("activationCode").value.trim();
+    if (code === "") {
+        alert("Please enter an activation code.");
+        verifyBtn.innerText = "Verify & Purchase";
+        verifyBtn.disabled = false;
+        return;
+    }
+
+    checkUserCodeExists((exists) => {
+        if (!exists) {
             verifyBtn.innerText = "Verify & Purchase";
             verifyBtn.disabled = false;
             return;
         }
 
-        checkUserCodeExists((exists) => {
-            if (!exists) {
-                verifyBtn.innerText = "Verify & Purchase";
-                verifyBtn.disabled = false;
-                return;
-            }
-
-            fetch(githubDatabaseURL)
-                .then(response => response.json())
-                .then(data => {
-                    let user = Object.values(data).find(user => user.activationCode === code);
-                    if (user) {
-                        if (user.balance >= 1) {
+        fetch(githubDatabaseURL)
+            .then(response => response.json())
+            .then(data => {
+                let user = Object.values(data).find(user => user.activationCode === code);
+                if (user) {
+                    checkTransactionHistory(user.mobile, (alreadyPurchased) => {
+                        if (alreadyPurchased) {
+                            window.location.href = `https://quickmovies.hopto.org/fast/?code=${userCode}`;
+                        } else if (user.balance >= 1) {
                             deductBalance(user.mobile, user.balance);
                         } else {
                             alert("Insufficient balance! You need at least ₹1.");
                             verifyBtn.innerText = "Verify & Purchase";
                             verifyBtn.disabled = false;
                         }
-                    } else {
-                        alert("Invalid activation code!");
-                        verifyBtn.innerText = "Verify & Purchase";
-                        verifyBtn.disabled = false;
-                    }
-                })
-                .catch(error => {
-                    alert("Error verifying code. Try again later.");
-                    console.error(error);
+                    });
+                } else {
+                    alert("Invalid activation code!");
                     verifyBtn.innerText = "Verify & Purchase";
                     verifyBtn.disabled = false;
-                });
-        });
-    }
+                }
+            })
+            .catch(error => {
+                alert("Error verifying code. Try again later.");
+                console.error(error);
+                verifyBtn.innerText = "Verify & Purchase";
+                verifyBtn.disabled = false;
+            });
+    });
+}
 
     function deductBalance(mobile, balance) {
         let newBalance = balance - 1;
@@ -358,6 +362,28 @@
             console.error(error);
         });
     }
+    
+    function checkTransactionHistory(mobile, callback) {
+    let historyFile = `${mobile}.json`;
+    let fileUrl = `${githubHistoryRepo}${historyFile}`;
+
+    fetch(fileUrl, {
+        method: "GET",
+        headers: { Authorization: `token ${apiKey}` }
+    })
+    .then(response => {
+        if (response.status === 404) return callback(false); // No previous transactions
+        return response.json().then(fileData => {
+            let transactions = JSON.parse(atob(fileData.content)).transactions;
+            let alreadyPurchased = transactions.some(tx => tx.url === window.location.href);
+            callback(alreadyPurchased);
+        });
+    })
+    .catch(error => {
+        console.error("Error checking transaction history:", error);
+        callback(false);
+    });
+}
 </script>
 
 </body>
