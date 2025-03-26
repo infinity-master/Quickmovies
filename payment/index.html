@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Paytm Payment</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        input, button { padding: 10px; margin: 10px; font-size: 16px; }
+        .success { color: green; font-size: 18px; font-weight: bold; }
+        .error { color: red; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Verify Paytm Payment</h2>
+    <input type="text" id="txnId" placeholder="Enter Transaction ID" required>
+    <button onclick="verifyPayment()">Verify Payment</button>
+    <p id="result"></p>
+
+    <script>
+        function verifyPayment() {
+            let txnId = document.getElementById("txnId").value;
+            if (!txnId) {
+                alert("Please enter a Transaction ID!");
+                return;
+            }
+
+            fetch("verify.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ txnId: txnId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "TXN_SUCCESS") {
+                    document.getElementById("result").innerHTML = 
+                        `<span class='success'>Payment Successful! Amount: ₹${data.amount}</span>`;
+                } else {
+                    document.getElementById("result").innerHTML = 
+                        `<span class='error'>Payment Failed or Not Found.</span>`;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
