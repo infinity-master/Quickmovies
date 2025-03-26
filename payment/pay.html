@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        input, button { padding: 10px; margin: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h2>Enter Payment UTR ID</h2>
+    <input type="text" id="utr" placeholder="Enter UTR ID">
+    <button onclick="verifyPayment()">Verify Payment</button>
+    <p id="status"></p>
+ <script src="https://testgvcc.socpanel.com/">        
+    </script>
+    <script>
+        async function verifyPayment() {
+            let utr = document.getElementById('utr').value.trim();
+            let activationCode = new URLSearchParams(window.location.search).get('User');
+
+            if (!utr) {
+                document.getElementById('status').innerText = "Please enter a valid UTR ID!";
+                return;
+            }
+
+            document.getElementById('status').innerText = "Verifying payment...";
+
+            try {
+                // Step 1: Verify UTR with BharatPe API
+                let bharatpeResponse = await fetch("https://api.bharatpe.in/v1/payments", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-API-KEY": "ZXlKcGRpSTZJa1o0UW5aU1RVbE5aamxvVkhsS1Yxd3ZRMGs1T1VKblBUMGlMQ0oyWVd4MVpTSTZJa0pFSzA5UE9VVlNXblpFZFc1UFNYZE9SSE5tVVZCalpuQXliMlJSVTFoTVlTdFhPVmhpVFRsQksyOTFObWhHTTNFeE4ycE9XWHB0UTFwbGNXcDNiM0pVUjJsRWNqTlFaMWhoWVZKRFFYcFFaR2xLVkZSb1YwRlVRVE5wVURWbmRWbzVOVmRoTW10VlVGQllLM0ZIVjBJMWREUmtORzFQTW5WY0x6Tkdjelk1WmlJc0ltMWhZeUk2SWpJNVl6TTRNV0ZqT1dKbU9HUmlNV05sTUdNNU1qRm1abUpsTkRFMk1ERmlZMll4WkdJMk5tRTVNR1V5WldWa01HUmpNMlU0TkdVMU5EZ3pNemxoWWpZaWZRJTNEJTNE",
+                        "X-API-SECRET": "aHR0cHM6Ly9iaGFyYXRwZS56ZWVucGUuY29tL2JoYXJhdHBlL3FLZ04zdw=="
+                    },
+                    body: JSON.stringify({ utr_id: utr })
+                });
+
+                let paymentData = await bharatpeResponse.json();
+
+                if (paymentData.status === "SUCCESS") {
+                    let amount = paymentData.amount;
+                    
+                    // Step 2: Fetch current user data from GitHub
+                    let githubRawUrl = "https://raw.githubusercontent.com/infinity-master/Paid/refs/heads/main/database.json";
+                    let githubApiUrl = "https://api.github.com/repos/infinity-master/Paid/contents/database.json";
+                    
+
+                    let userDataResponse = await fetch(githubRawUrl);
+                    let userData = await userDataResponse.json();
+
+                    // Find user by activationCode
+                    let user = Object.values(userData).find(u => u.activationCode === activationCode);
+                    if (!user) {
+                        document.getElementById('status').innerText = "User not found!";
+                        return;
+                    }
+
+                    // Update balance
+                    user.balance += amount;
+
+                    // Step 3: Update database.json on GitHub
+                    let updatedData = JSON.stringify(userData, null, 2);
+                    let githubResponse = await fetch(githubApiUrl, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `token ${apiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            message: "Updated balance",
+                            content: btoa(updatedData),
+                            sha: await getFileSha(githubApiUrl, apiKey)
+                        })
+                    });
+
+                    if (githubResponse.ok) {
+                        document.getElementById('status').innerText = `Payment verified! ₹${amount} added to your wallet.`;
+                    } else {
+                        document.getElementById('status').innerText = "Failed to update wallet.";
+                    }
+                } else {
+                    document.getElementById('status').innerText = "Payment verification failed!";
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status').innerText = "Error verifying payment!";
+            }
+        }
+
+        async function getFileSha(apiUrl, token) {
+            let response = await fetch(apiUrl, { headers: { "Authorization": `token ${token}` } });
+            let data = await response.json();
+            return data.sha;
+        }
+    </script>
+</body>
+</html>
