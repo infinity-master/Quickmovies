@@ -3,18 +3,20 @@ header("Content-Type: application/json");
 
 // Paytm Merchant Credentials
 $merchantId = "pFrxao17701984490551";
-$merchantKey = "YOUR_MERCHANT_KEY"; // Required for checksum
+$merchantKey = "YOUR_MERCHANT_KEY"; // Replace with your Merchant Key
 $apiUrl = "https://securegw.paytm.in/merchant-status/getTxnStatus";
 
-// Read input from user
+// Get JSON input from frontend
 $data = json_decode(file_get_contents("php://input"), true);
-$orderId = $data["txnId"]; // Transaction ID
+$orderId = $data["txnId"];
+
+if (!$orderId) {
+    echo json_encode(["status" => "TXN_FAILURE", "message" => "Invalid Transaction ID"]);
+    exit;
+}
 
 // Generate Checksum
-$paytmParams = array(
-    "mid" => $merchantId,
-    "orderId" => $orderId
-);
+$paytmParams = array("mid" => $merchantId, "orderId" => $orderId);
 $checksum = hash_hmac("sha256", json_encode($paytmParams), $merchantKey);
 
 // API Request Payload
@@ -34,7 +36,7 @@ curl_close($ch);
 
 // Process API Response
 $result = json_decode($response, true);
-if ($result["body"]["status"] === "TXN_SUCCESS") {
+if (isset($result["body"]["status"]) && $result["body"]["status"] === "TXN_SUCCESS") {
     echo json_encode([
         "status" => "TXN_SUCCESS",
         "amount" => $result["body"]["txnAmount"]
