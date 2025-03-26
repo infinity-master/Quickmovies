@@ -14,16 +14,18 @@
 <body>
     <h2>Verify Paytm Payment</h2>
     <input type="text" id="txnId" placeholder="Enter Transaction ID" required>
-    <button onclick="verifyPayment()">Verify Payment</button>
+    <button id="verifyBtn">Verify Payment</button>
     <p id="result"></p>
 
     <script>
-        function verifyPayment() {
+        document.getElementById("verifyBtn").addEventListener("click", function() {
             let txnId = document.getElementById("txnId").value;
             if (!txnId) {
                 alert("Please enter a Transaction ID!");
                 return;
             }
+
+            document.getElementById("result").innerHTML = "Verifying payment...";
 
             fetch("verify.php", {
                 method: "POST",
@@ -40,8 +42,11 @@
                         `<span class='error'>Payment Failed or Not Found.</span>`;
                 }
             })
-            .catch(error => console.error("Error:", error));
-        }
+            .catch(error => {
+                document.getElementById("result").innerHTML = `<span class='error'>Error verifying payment.</span>`;
+                console.error("Error:", error);
+            });
+        });
     </script>
 </body>
 </html>
