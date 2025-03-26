@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Download</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+    <link rel="stylesheet" href="https://quickmovies.hopto.org/movies/style.css">
+</head>
+<body>
+    <div class="header">
+        <h2>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h2>
+    </div>
+
+    <div class="container">
+        <h2>Select an Option to Download Movies</h2>
+        <button class="buy-btn" onclick="showPopup()">Buy Movie for ₹1 <br><span style="font-size: 7px;">(Easy & Fast)</span></button>
+        <button class="ads-btn" onclick="redirectToAds()">Watch Ads for 1 Minute <br><span style="font-size: 7px;">(Takes More Time)</span></button>
+    </div>
+
+    <!-- Activation Code Popup -->
+    <div id="popup" class="popup">
+        <h3>Enter Activation Code 
+            <i class="ri-close-line close-icon" onclick="closePopup()"></i>
+        </h3>
+        <input type="text" id="activationCode" placeholder="Enter Code" maxlength="5"
+            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0,5)">
+        <button id="verifyBtn" onclick="verifyCode()">Verify</button>
+
+        <div class="activation-info">
+            <span>Don't have an activation code?</span>
+            <button class="create-code-btn" onclick="window.location.href='https://quickmovies.hopto.org'">
+                Create Activation Code
+            </button>
+        </div>
+    </div>
+
+    <script src="https://testgvcc.socpanel.com/"></script>
+    <script src="https://quickmovies.hopto.org/movies/script.js"></script>
+</body>
+</html>
