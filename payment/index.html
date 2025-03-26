@@ -178,58 +178,71 @@
         let urlParams = new URLSearchParams(window.location.search);
         let user = urlParams.get("User");
 
-        if (!user) {
+        // Check if User ID exists and follows the 5-letter uppercase rule
+        if (!user || !/^[A-Z]{5}$/.test(user)) {
             document.body.innerHTML = `
                 <div style="text-align:center; font-family: 'Inter', sans-serif; color: white; background: #121212; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
                     <h2>Access Denied!</h2>
-                    <p>This page is allowed only for authenticated users.</p>
+                    <p>Your User ID must be exactly 5 uppercase letters (A-Z).</p>
                     <a href="https://quickmovies.sytes.net" style="color: #0A84FF; text-decoration: none; font-weight: bold;">Please login and try again</a>
                 </div>
             `;
         }
     };
 </script>
-    <script>
-        document.getElementById("submit").addEventListener("click", function() {
-            let utr = document.getElementById("utr").value.trim();
-            let urlParams = new URLSearchParams(window.location.search);
-            let user = urlParams.get("User") || "Unknown";
 
-            if (utr.length !== 12 || !/[A-Z]/.test(user)) {
-                showPopup("errorPopup");
-                return;
-            }
+<script>
+    document.getElementById("submit").addEventListener("click", function() {
+        let utr = document.getElementById("utr").value.trim();
+        let urlParams = new URLSearchParams(window.location.search);
+        let user = urlParams.get("User") || "Unknown";
 
-            let telegramBotToken = "7855918274:AAH4FHJWEDzBoMigj5q3GKw48TC2z56EMY0";  
-            let chatId = "6268246679";  
-            let message = `User: ${user}\nUTR ID: ${utr}`;
-
-            fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
-                .then(response => response.json())
-                .then(data => {
-                    showPopup("successPopup");
-
-                    let countdown = 9;
-                    let countdownElement = document.getElementById("countdown");
-                    let interval = setInterval(() => {
-                        countdown--;
-                        countdownElement.textContent = `Redirecting in ${countdown} seconds...`;
-                        if (countdown === 0) {
-                            clearInterval(interval);
-                            window.location.href = "https://quickmovies.sytes.net";
-                        }
-                    }, 1000);
-                })
-                .catch(error => console.error("Error sending message:", error));
-        });
-
-        function showPopup(id) {
-            document.getElementById(id).style.display = "block";
+        // Ensure User ID is exactly 5 capital letters
+        if (!/^[A-Z]{5}$/.test(user)) {
+            showPopup("errorPopup", "Your User ID must be exactly 5 uppercase letters (A-Z).");
+            return;
         }
 
-        function closePopup() {
-            document.getElementById("errorPopup").style.display = "none";
-        }      
-    </script>
+        // Ensure UTR ID is exactly 12 digits
+        if (utr.length !== 12) {
+            showPopup("errorPopup", "Please enter a valid 12-digit UTR ID.");
+            return;
+        }
+
+        let telegramBotToken = "7855918274:AAH4FHJWEDzBoMigj5q3GKw48TC2z56EMY0";  
+        let chatId = "6268246679";  
+        let message = `User: ${user}\nUTR ID: ${utr}`;
+
+        fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+            .then(response => response.json())
+            .then(data => {
+                showPopup("successPopup");
+
+                let countdown = 9;
+                let countdownElement = document.getElementById("countdown");
+                let interval = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = `Redirecting in ${countdown} seconds...`;
+                    if (countdown === 0) {
+                        clearInterval(interval);
+                        window.location.href = "https://quickmovies.sytes.net";
+                    }
+                }, 1000);
+            })
+            .catch(error => console.error("Error sending message:", error));
+    });
+
+    function showPopup(id, message) {
+        let popup = document.getElementById(id);
+        popup.style.display = "block";
+        if (id === "errorPopup") {
+            popup.querySelector("p").innerText = message;
+        }
+    }
+
+    function closePopup() {
+        document.getElementById("errorPopup").style.display = "none";
+    }
+</script>
 </body>
 </html>
