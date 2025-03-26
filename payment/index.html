@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Movies - Payment</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .container {
+            background: rgba(28, 28, 30, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in-out forwards 0.2s;
+        }
+
+        .qr-box {
+            background: black;
+            padding: 10px;
+            border-radius: 12px;
+            margin: 15px 0;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .qr-box:hover {
+            transform: scale(1.05);
+        }
+
+        img {
+            width: 300px;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        img:hover {
+            transform: scale(1.05);
+        }
+
+        p {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in-out forwards 0.4s;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 10px;
+            background: #2C2C2E;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            outline: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        input:focus {
+            background: #3A3A3C;
+            transform: scale(1.03);
+        }
+
+        button {
+            width: 70%;
+            padding: 12px;
+            background: #0A84FF;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #007AFF;
+            transform: scale(1.05);
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #A1A1A1;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards 0.6s;
+        }
+
+        /* Premium Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-box {
+            background: #1E1E1E;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+            animation: fadeInPopup 0.4s ease-in-out forwards;
+        }
+
+        .popup-box h3 {
+            color: #FF3B30;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .popup-box p {
+            color: #D1D1D1;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .popup-box button {
+            padding: 10px 20px;
+            background: #FF453A;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .popup-box button:hover {
+            background: #D70015;
+        }
+
+        @keyframes fadeInPopup {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quick Movies - Payment</h2>
+        <img src="https://quickmovies.sytes.net/payment/qr.png" alt="Scan QR Code">
+        <p>Scan the QR code above and enter your <b>UTR ID</b> below.</p>
+        <input type="text" id="utr" placeholder="Enter UTR ID">
+        <button id="submit">Submit</button>
+        <p>We will detect the amount and add it to your wallet.</p>
+        <p><b>Don't worry! Your funds are 101% safe and secured with us.</b></p>
+        <p id="message"></p>
+    </div>
+
+    <!-- Premium Popup -->
+    <div class="popup-overlay" id="popup">
+        <div class="popup-box">
+            <h3>Submission Error</h3>
+            <p>Your username must contain at least one uppercase letter.</p>
+            <button onclick="closePopup()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("submit").addEventListener("click", function() {
+            let utr = document.getElementById("utr").value.trim();
+            let urlParams = new URLSearchParams(window.location.search);
+            let user = urlParams.get("User") || "Unknown";
+
+            if (utr === "") {
+                alert("Please enter a valid UTR ID.");
+                return;
+            }
+
+            // Check if user contains at least one uppercase letter
+            if (!/[A-Z]/.test(user)) {
+                document.getElementById("popup").style.display = "flex";
+                return;
+            }
+
+            let telegramBotToken = "7855918274:AAH4FHJWEDzBoMigj5q3GKw48TC2z56EMY0";  
+            let chatId = "6268246679";  
+            let message = `User: ${user}\nUTR ID: ${utr}`;
+
+            fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("message").textContent = "Your money will be added within 10 minutes. If not credited, message the admin of this group.";
+                    document.getElementById("message").style.color = "#0A84FF";
+                })
+                .catch(error => console.error("Error sending message:", error));
+        });
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+    </script>
+</body>
+</html>
