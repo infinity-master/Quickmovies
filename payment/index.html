@@ -151,7 +151,7 @@
         <p>Scan the QR code above and enter your <b>UTR ID</b> below.</p>
 
         <div class="input-container">
-            <input type="text" id="utr" placeholder="Enter UTR ID" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" id="utr" placeholder="Enter UTR ID" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
            
         </div>
 
@@ -195,7 +195,7 @@
             let urlParams = new URLSearchParams(window.location.search);
             let user = urlParams.get("User") || "Unknown";
 
-            if (utr.length !== 13 || !/[A-Z]/.test(user)) {
+            if (utr.length !== 12 || !/[A-Z]/.test(user)) {
                 showPopup("errorPopup");
                 return;
             }
