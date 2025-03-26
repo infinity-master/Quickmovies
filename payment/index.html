@@ -16,7 +16,6 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            transition: background 0.3s ease-in-out;
         }
 
         .container {
@@ -26,53 +25,38 @@
             text-align: center;
             width: 350px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.5s ease-in-out forwards;
+            position: relative;
         }
 
         h2 {
             font-size: 22px;
             font-weight: 600;
             margin-bottom: 10px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease-in-out forwards 0.2s;
-        }
-
-        .qr-box {
-            background: black;
-            padding: 10px;
-            border-radius: 12px;
-            margin: 15px 0;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .qr-box:hover {
-            transform: scale(1.05);
         }
 
         img {
             width: 300px;
             height: auto;
             border-radius: 8px;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        img:hover {
-            transform: scale(1.05);
         }
 
         p {
             font-size: 14px;
             color: #ccc;
             margin-bottom: 10px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease-in-out forwards 0.4s;
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         input {
-            width: 90%;
+            width: 100%;
             padding: 12px;
+            padding-right: 40px;
             margin: 12px 0;
             border: none;
             border-radius: 10px;
@@ -81,12 +65,14 @@
             text-align: center;
             font-size: 16px;
             outline: none;
-            transition: background 0.3s, transform 0.2s;
         }
 
-        input:focus {
-            background: #3A3A3C;
-            transform: scale(1.03);
+        .paste-icon {
+            position: absolute;
+            right: 15px;
+            font-size: 20px;
+            color: #0A84FF;
+            cursor: pointer;
         }
 
         button {
@@ -98,92 +84,63 @@
             color: white;
             font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
         }
 
         button:hover {
             background: #007AFF;
-            transform: scale(1.05);
         }
 
-        #message {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #A1A1A1;
-            opacity: 0;
-            animation: fadeIn 1s ease-in-out forwards 0.6s;
-        }
-
-        /* Premium Popup */
-        .popup-overlay {
+        .popup {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .popup-box {
-            background: #1E1E1E;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
             padding: 20px;
             border-radius: 12px;
             text-align: center;
-            width: 320px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
-            animation: fadeInPopup 0.4s ease-in-out forwards;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        .popup-box h3 {
-            color: #FF3B30;
+        .popup h3 {
+            margin: 0;
             font-size: 18px;
-            margin-bottom: 10px;
+            color: #ff4d4d;
         }
 
-        .popup-box p {
-            color: #D1D1D1;
+        .popup p {
             font-size: 14px;
-            margin-bottom: 15px;
+            color: #ddd;
+            margin-top: 10px;
         }
 
-        .popup-box button {
-            padding: 10px 20px;
-            background: #FF453A;
+        .popup button {
+            margin-top: 10px;
+            background: #ff4d4d;
             border: none;
-            border-radius: 8px;
+            padding: 8px 15px;
             color: white;
             cursor: pointer;
-            transition: background 0.3s ease-in-out;
+            border-radius: 8px;
         }
 
-        .popup-box button:hover {
-            background: #D70015;
+        .popup button:hover {
+            background: #e60000;
         }
 
-        @keyframes fadeInPopup {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        #countdown {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0A84FF;
+            margin-top: 10px;
         }
 
-        /* Fade-in animation */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -192,36 +149,54 @@
         <h2>Quick Movies - Payment</h2>
         <img src="https://quickmovies.sytes.net/payment/qr.png" alt="Scan QR Code">
         <p>Scan the QR code above and enter your <b>UTR ID</b> below.</p>
-        <input type="text" id="utr" placeholder="Enter UTR ID">
+
+        <div class="input-container">
+            <input type="text" id="utr" placeholder="Enter UTR ID" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+           
+        </div>
+
         <button id="submit">Submit</button>
         <p>We will detect the amount and add it to your wallet.</p>
         <p><b>Don't worry! Your funds are 101% safe and secured with us.</b></p>
-        <p id="message"></p>
     </div>
 
-    <!-- Premium Popup -->
-    <div class="popup-overlay" id="popup">
-        <div class="popup-box">
-            <h3>Submission Error</h3>
-            <p>Your username must contain at least one uppercase letter.</p>
-            <button onclick="closePopup()">OK</button>
-        </div>
+    <!-- Error Popup -->
+    <div class="popup" id="errorPopup">
+        <h3>Invalid Entry!</h3>
+        <p>Please enter a valid 13-digit UTR ID and ensure your username contains at least one capital letter.</p>
+        <button onclick="closePopup()">OK</button>
     </div>
 
+    <!-- Success Popup -->
+    <div class="popup" id="successPopup">
+        <h3>Success!</h3>
+        <p>Your money will be added within 10 minutes. If not credited, message the admin of this group.</p>
+        <p id="countdown">Redirecting in 9 seconds...</p>
+    </div>
+<script>
+    window.onload = function() {
+        let urlParams = new URLSearchParams(window.location.search);
+        let user = urlParams.get("User");
+
+        if (!user) {
+            document.body.innerHTML = `
+                <div style="text-align:center; font-family: 'Inter', sans-serif; color: white; background: #121212; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                    <h2>Access Denied!</h2>
+                    <p>This page is allowed only for authenticated users.</p>
+                    <a href="https://quickmovies.sytes.net" style="color: #0A84FF; text-decoration: none; font-weight: bold;">Please login and try again</a>
+                </div>
+            `;
+        }
+    };
+</script>
     <script>
         document.getElementById("submit").addEventListener("click", function() {
             let utr = document.getElementById("utr").value.trim();
             let urlParams = new URLSearchParams(window.location.search);
             let user = urlParams.get("User") || "Unknown";
 
-            if (utr === "") {
-                alert("Please enter a valid UTR ID.");
-                return;
-            }
-
-            // Check if user contains at least one uppercase letter
-            if (!/[A-Z]/.test(user)) {
-                document.getElementById("popup").style.display = "flex";
+            if (utr.length !== 13 || !/[A-Z]/.test(user)) {
+                showPopup("errorPopup");
                 return;
             }
 
@@ -232,15 +207,29 @@
             fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("message").textContent = "Your money will be added within 10 minutes. If not credited, message the admin of this group.";
-                    document.getElementById("message").style.color = "#0A84FF";
+                    showPopup("successPopup");
+
+                    let countdown = 9;
+                    let countdownElement = document.getElementById("countdown");
+                    let interval = setInterval(() => {
+                        countdown--;
+                        countdownElement.textContent = `Redirecting in ${countdown} seconds...`;
+                        if (countdown === 0) {
+                            clearInterval(interval);
+                            window.location.href = "https://quickmovies.sytes.net";
+                        }
+                    }, 1000);
                 })
                 .catch(error => console.error("Error sending message:", error));
         });
 
-        function closePopup() {
-            document.getElementById("popup").style.display = "none";
+        function showPopup(id) {
+            document.getElementById(id).style.display = "block";
         }
+
+        function closePopup() {
+            document.getElementById("errorPopup").style.display = "none";
+        }      
     </script>
 </body>
 </html>
