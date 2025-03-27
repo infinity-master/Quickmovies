@@ -4,237 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - QuickMovies</title>
-    <style>
-        /* General Styling */
-        body {
-            font-family: 'SF Pro Display', Arial, sans-serif;
-            text-align: center;
-            background: #1C1C1E;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            background: #2C2C2E;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        h2 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        /* Info Boxes */
-        .info-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #3A3A3C;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .info-box input {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 16px;
-            width: 100%;
-        }
-
-        /* Edit Icons */
-        .edit-icon {
-            cursor: pointer;
-            font-size: 18px;
-            color: #00A9FF;
-        }
-
-        /* Save Button */
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #007AFF;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #005ECF;
-        }
-
-        /* Popups */
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #2C2C2E;
-            padding: 20px;
-            width: 80%;
-            max-width: 300px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            display: none;
-        }
-
-        .popup input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: #3A3A3C;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-        }
-
-        .popup-buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .popup button {
-            width: 48%;
-            background: #00A9FF;
-        }
-
-        .popup button.cancel {
-            background: #FF3B30;
-        }
-
-        .status {
-            font-size: 14px;
-            margin-top: 10px;
-            color: #A0A0A0;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css"
 </head>
 <body>
     <div class="container">
         <h2>Settings</h2>
-
-        <div class="info-box">
-            <span>Mobile Number:</span>
-            <span id="mobile">Loading...</span>
+        <div class="card">
+            <label>Mobile Number</label>
+            <div class="info" id="mobile">Loading...</div>
         </div>
-
-        <div class="info-box">
-            <span>PIN:</span>
-            <input type="password" id="pin" disabled>
-            <span class="edit-icon" onclick="openPopup('pinPopup')">✏️</span>
+        <div class="card">
+            <label>PIN</label>
+            <div class="info">
+                <span id="pin">••••••</span>
+               <a href="forget-password.html" class="addfund-icon"><i class="ri-edit-line edit"></i></a>
+                <i class="ri-eye-off-line eye-icon" onclick="togglePin()"></i>
+            </div>
         </div>
-
-        <div class="info-box">
-            <span>Activation Code:</span>
-            <input type="text" id="activationCode" disabled>
-            <span class="edit-icon" onclick="openPopup('activationPopup')">✏️</span>
-        </div>
-
-        <div class="info-box">
-            <span>Balance:</span>
-            <span id="balance">Loading...</span>
-        </div>
-
-        <button onclick="updateUser()">Save Changes</button>
-        <p class="status" id="status"></p>
+        <div class="card">
+    <label>Activation Code</label>
+    <div class="info">
+        <span id="activationCode">Loading...</span>
+        <i class="ri-file-copy-line copy-icon" onclick="copyActivationCode()"></i>
     </div>
-
-    <!-- PIN Edit Popup -->
-    <div class="popup" id="pinPopup">
-        <h3>Edit PIN</h3>        
-        <input type="password" id="newPin" placeholder="Enter new PIN" maxlength="4">      
-        <div class="popup-buttons">
-            <button onclick="saveEdit('pin')">Save</button>
-            <button class="cancel" onclick="closePopup('pinPopup')">Cancel</button>
-        </div>
+</div>
+      <div class="card">
+    <label>Balance</label>
+    <div class="info">
+        <span id="balance">Loading...</span>
+        <a id="addMoneyLink" href="#" class="addfund-icon">          
+            <i class="ri-add-line"></i>
+        </a>
     </div>
-
-    <!-- Activation Code Edit Popup -->
-    <div class="popup" id="activationPopup">
-        <h3>Edit Activation Code</h3>
-        <input type="text" id="newActivationCode" placeholder="Enter new Activation Code" maxlength="5" oninput="this.value = this.value.toUpperCase().slice(0,5)">       
-        <div class="popup-buttons">
-            <button onclick="saveEdit('activationCode')">Save</button>
-            <button class="cancel" onclick="closePopup('activationPopup')">Cancel</button>
-        </div>
+</div>
+        <p id="status"></p>
     </div>
-
-    <script>
-        const databaseUrl = "https://raw.githubusercontent.com/infinity-master/Paid/refs/heads/main/database.json";
-
-        async function fetchUser() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const activationCode = urlParams.get("User");
-
-            if (!activationCode) {
-                document.getElementById("status").innerText = "Activation Code Missing!";
-                return;
-            }
-
-            try {
-                const response = await fetch(databaseUrl);
-                const data = await response.json();
-
-                let user = Object.values(data).find(user => user.activationCode === activationCode);
-
-                if (user) {
-                    document.getElementById("mobile").innerText = user.mobile;
-                    document.getElementById("pin").value = user.pin;
-                    document.getElementById("activationCode").value = user.activationCode;
-                    document.getElementById("balance").innerText = user.balance;
-                } else {
-                    document.getElementById("status").innerText = "User Not Found!";
-                }
-            } catch (error) {
-                document.getElementById("status").innerText = "Error fetching data!";
-            }
-        }
-
-        function openPopup(popupId) {
-            document.getElementById(popupId).style.display = "block";
-        }
-
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = "none";
-        }
-
-        function saveEdit(field) {
-            if (field === 'pin') {
-                document.getElementById("pin").value = document.getElementById("newPin").value;
-                closePopup("pinPopup");
-            } else if (field === 'activationCode') {
-                document.getElementById("activationCode").value = document.getElementById("newActivationCode").value;
-                closePopup("activationPopup");
-            }
-        }
-
-        async function updateUser() {
-            const mobile = document.getElementById("mobile").innerText;
-            const newPin = document.getElementById("pin").value;
-            const newActivationCode = document.getElementById("activationCode").value;
-
-            if (!mobile || !newPin || !newActivationCode) {
-                document.getElementById("status").innerText = "All fields are required!";
-                return;
-            }
-
-            document.getElementById("status").innerText = "Updated Successfully!";
-        }
-
-        fetchUser();
-    </script>
+<!---Scripts--->
+<script src="addmoney.js"></script>
+<script src="get.js"></script>
+<script src="copy.js"></script>
 </body>
 </html>
