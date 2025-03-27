@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="https://quickmovies.sytes.net/settings/">
     <title>Settings - QuickMovies</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="style.css"
@@ -14,14 +15,20 @@
             <label>Mobile Number</label>
             <div class="info" id="mobile">Loading...</div>
         </div>
+        
         <div class="card">
-            <label>PIN</label>
-            <div class="info">
-                <span id="pin">••••</span>
-               <a href="forget-password.html" class="addfund-icon"><i class="ri-edit-line edit"></i></a>
-                <i class="ri-eye-off-line eye-icon" onclick="togglePin()"></i>
-            </div>
-        </div>
+    <label>PIN</label>
+    <div class="info">
+        <span id="pin" data-pin="1234">••••</span>
+        <a href="forget-password.html" class="addfund-icon">
+            <i class="ri-edit-line edit"></i>
+        </a>
+        <i class="ri-eye-off-line eye-icon" onclick="togglePin()"></i>
+    </div>
+</div>
+
+
+        
         <div class="card">
     <label>Activation Code</label>
     <div class="info">
@@ -41,6 +48,24 @@
         <p id="status"></p>
     </div>
 <!---Scripts--->
+
+<script>
+function togglePin() {
+    const pinElement = document.getElementById("pin");
+    const eyeIcon = document.querySelector(".eye-icon");
+    const actualPin = pinElement.getAttribute("data-pin"); // Get actual PIN from data attribute
+
+    if (pinElement.innerText === "••••") {
+        pinElement.innerText = actualPin; // Show PIN
+        eyeIcon.classList.replace("ri-eye-off-line", "ri-eye-line");
+
+        setTimeout(() => {
+            pinElement.innerText = "••••"; // Hide PIN after 1 second
+            eyeIcon.classList.replace("ri-eye-line", "ri-eye-off-line");
+        }, 1000);
+    }
+}
+</script>
 <script src="addmoney.js"></script>
 <script src="get.js"></script>
 <script src="copy.js"></script>
