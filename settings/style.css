@@ -67,3 +67,8 @@ body {
     position: absolute;
     top: 45px;    
     right: 70px;
+         }              
+ .addfund-icon {
+        color: white;
+        text-decoration: none;
+ }
