@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>Quick Movies</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <!-- Login Box -->
    <div id="loginBox" class="container">
     <h2>Login</h2>
@@ -51,7 +50,6 @@
             <p>Loading transactions...</p>
         </div>
     </div>
-
     <!-- Dashboard -->
     <div id="dashboard" class="container hidden">
         <header id="noAuthHeader">
@@ -69,8 +67,7 @@
                             <li class="hdMnIt"><a class="hdMnLi select">Home</a></li>
                             <li class="hdMnIt"><a class="hdMnLi" onclick="AddMoney()">Add Money</a></li>
                             <li class="hdMnIt"><a class="hdMnLi" onclick="settings()">Settings</a></li>
-                            <li class="hdMnIt"><a class="hdMnLi" onclick="showTransactionHistory()">Transaction History</a></li>
-                            
+                            <li class="hdMnIt"><a class="hdMnLi" onclick="showTransactionHistory()">Transaction History</a></li>                      
                             <li class="hdMnIt"><a class="hdMnLi" onclick="deleteAccount()">Delete Account</a></li>
                             <li class="hdMnIt"><a class="hdMnLi" onclick="logout()">Logout</a></li>
                         </ul>
@@ -78,7 +75,6 @@
                 </div>
             </div>
         </header>
-
         <!-- Activation Code Section -->
         <div class="activation-container">
             <p class="title"><strong>Activation Code</strong></p>
@@ -88,140 +84,16 @@
             </div>
         </div>
         <p id="copyMessage"></p>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://testgvcc.socpanel.com"></script>
-    <script>
-        const repoOwner = "infinity-master";
-        const repoName = "Paid";
-        const filePath = "database.json";
-        let userData = {};
-
-        async function fetchData() {
-            const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-            try {
-                let response = await fetch(url, { headers: { Authorization: `token ${apiKey}` } });
-                let data = await response.json();
-                if (data.content) {
-                    return JSON.parse(atob(data.content)); // Decode and parse data
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                return {};
-            }
-        }
-
-async function updateGitHub(data) {
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-            let existingFile = await fetch(apiUrl, { headers: { Authorization: `token ${apiKey}` } }).then(res => res.json());
-
-            let updatedContent = btoa(JSON.stringify(data, null, 2));
-            let payload = {
-                message: "Updated user data",
-                content: updatedContent,
-                sha: existingFile.sha
-            };
-
-            try {
-                await fetch(apiUrl, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `token ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-                console.log("GitHub data updated successfully!");
-            } catch (error) {
-                console.error("Error updating GitHub:", error);
-            }
-        }
-
-        async function login() {
-            let mobile = document.getElementById("userMobile").value.trim();
-            let pin = document.getElementById("userPIN").value.trim();
-            let users = await fetchData();
-
-            if (!users[mobile]) {
-                showError("User not found!");
-                return;
-            }
-
-            if (users[mobile].pin !== pin) {
-                showError("Incorrect PIN!");
-                return;
-            }
-
-            userData = users[mobile];
-            localStorage.setItem("loggedInUser", JSON.stringify(userData));
-            showDashboard();
-        }
-
-        function showError(message) {
-            let errorMsg = document.getElementById("errorMessage");
-            errorMsg.innerText = message;
-            errorMsg.style.display = "block";
-        }
-
-        function showDashboard() {
-            document.getElementById("activationCodeText").innerText = userData.activationCode;
-
-            function updateBalance() {
-                fetchData().then(users => {
-                    if (users[userData.mobile]) {
-                        userData.balance = users[userData.mobile].balance;
-                        document.getElementById("walletBalance").innerText = userData.balance;
-                    }
-                });
-            }
-
-            updateBalance();
-            setInterval(updateBalance, 2000);
-
-            document.getElementById("dashboard").classList.remove("hidden");
-            document.getElementById("loginBox").classList.add("hidden");
-            document.getElementById("registerBox").classList.add("hidden");
-            document.getElementById("errorMessage").style.display = "none";
-        }
-
-        function toggleForms() {
-            document.getElementById("registerBox").classList.toggle("hidden");
-            document.getElementById("loginBox").classList.toggle("hidden");
-        }
-
-        function logout() {
-            localStorage.removeItem("loggedInUser");
-            document.getElementById("dashboard").classList.add("hidden");
-            document.getElementById("loginBox").classList.remove("hidden");
-        }
-
-        function AddMoney() {
-            let activationCode = document.getElementById("activationCodeText").innerText;
-            window.location.href = `https://quickmovies.sytes.net/payment/?User=${activationCode}`;
-        }
-
-function settings() {
-            let activationCode = document.getElementById("activationCodeText").innerText;
-            window.location.href = `https://quickmovies.sytes.net/settings?User=${activationCode}`;
-        }
-
-        window.onload = function () {
-            let savedUser = localStorage.getItem("loggedInUser");
-            if (savedUser) {
-                userData = JSON.parse(savedUser);
-                showDashboard();
-            }
-        };
-    </script>
+    </div>   
     <!-- External Scripts -->
-    <script src="https://quickmovies.sytes.net/generate-actcode.js"></script>
-    <script src="https://quickmovies.sytes.net/delete-ac.js"></script>
-    <script src="https://quickmovies.sytes.net/transaction.js"></script>
-    <script src="https://quickmovies.sytes.net/register.js"></script>
-    <script src="https://quickmovies.sytes.net/copy-code.js"></script>
-    <script src="https://quickmovies.sytes.net/pas-eye.js"></script>
-    <script src="https://quickmovies.sytes.net/menu-btn.js"></script>
-
+ <script src="https://testgvcc.socpanel.com"></script>
+ <script src="script.js"></script>
+ <script src="generate-actcode.js"></script>
+ <script src="delete-ac.js"></script>
+ <script src="transaction.js"></script>
+ <script src="register.js"></script>
+ <script src="copy-code.js"></script>
+ <script src="pas-eye.js"></script>
+ <script src="menu-btn.js"></script>
 </body>
 </html>
