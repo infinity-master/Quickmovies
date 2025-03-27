@@ -25,6 +25,7 @@ body {
     justify-content: center;
     border-radius: 8px;
     transition: all 0.3s ease-in-out;
+    
 }
 
 /* Input and Button Styling */
@@ -277,7 +278,7 @@ button:active {
         transform: translateY(-50%);
         cursor: pointer;
         font-size: 20px;
-        color: gray;
+        color: white;
     }
     
     .balance {
@@ -470,7 +471,7 @@ button:active {
     right: -10px;
     cursor: pointer;
     font-size: 18px;
-    color: gray;
+    color: white;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -480,8 +481,8 @@ button:active {
 .forgetbtn {
             color: white;
             text-decoration: none;
-            position: fixed;            
-            right: 20px;
+            position: absolute;            
+            right: -28px;
         }
         
         .regbtn {
