@@ -34,20 +34,6 @@ const databaseUrl = "https://raw.githubusercontent.com/infinity-master/Paid/refs
             }
         }
 
-        function togglePin() {
-            const pinElement = document.getElementById("pin");
-            const eyeIcon = document.querySelector(".eye-icon");
-            const actualPin = pinElement.getAttribute("data-pin");
-
-            if (pinElement.innerText === "••••") {
-                pinElement.innerText = actualPin;
-                eyeIcon.classList.replace("ri-eye-off-line", "ri-eye-line");
-
-                setTimeout(() => {
-                    pinElement.innerText = "••••";
-                    eyeIcon.classList.replace("ri-eye-line", "ri-eye-off-line");
-                }, 1000);
-            }
-        }
+        
 
         fetchUser();
