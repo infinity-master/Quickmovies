@@ -51,8 +51,8 @@ async function showTransactionHistory() {
         }
 
     } catch (error) {
-        console.error("Error fetching transaction history:", error);
-        transactionList.innerHTML = "<p>Error loading transactions. Please try again later.</p>";
+        console.error("Transaction history not found!", error);
+        transactionList.innerHTML = "<p>Transaction history not found!</p>";
     }
 
     // Show the popup smoothly
