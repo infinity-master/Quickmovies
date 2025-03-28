@@ -1,0 +1,175 @@
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        /* Design */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to right, #1a1a1a, #222);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 360px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease-in-out;
+        }
+
+        h2 {
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s ease;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #18a0fb, #0064d2);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 100, 210, 0.5);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #0070f3, #0044aa);
+            box-shadow: 0 6px 15px rgba(0, 100, 210, 0.6);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: 8px;
+            color: #18a0fb;
+            transition: 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            color: #0070f3;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+            display: none;
+        }
+        
+        input::placeholder {
+    color: white;
+}
+
+.card { background: linear-gradient(145deg, #2A2A2D, #18181A); box-shadow: 5px 5px 10px #141416, -5px -5px 10px #2E2E30; border-radius: 15px; padding: 15px; margin-bottom: 15px; text-align: left; position: relative; } .card label { font-size: 14px; color: #b0b0b3; display: block; margin-bottom: 5px; }
+        
+        .edit {
+            cursor: pointer;
+            font-size: 25px;
+            margin-left: 10px;
+            color: white;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            
+        }
+
+        .edit:hover {
+            color: #fff;
+        }     
+      .pin {
+        cursor: pointer;
+            font-size: 25px;
+            margin-left: 10px;
+            color: white;
+    position: absolute;
+    top: 10px;    
+    left: 30px;
+         }                
+.close-btn {
+    float: right;
+    font-size: 25px;
+    cursor: pointer;
+    color: red;
+    transition: 0.3s;
+    position: absolute
+    top: 10px;
+    
+}
+
+.close-btn:hover {
+    color: #ff0000;
+}
+.pin-container {
+    position: relative;
+    display: inline-block;
+}
+
+.eye-icon {
+            cursor: pointer;
+            font-size: 21px;
+            margin-left: 10px;
+            color: white;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            
+        }
