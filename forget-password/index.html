@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forget Password</title>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="page1">
+        <h2>Forget Password</h2>
+        <p>Enter your mobile number to reset your PIN</p>
+        <input type="text" id="mobile" placeholder="Enter your mobile" maxlength="10">
+        <button onclick="verifyNumber()">Verify</button>
+    </div>
+    <div class="container hidden" id="page2">
+        <h2>Enter Activation Code</h2>
+       <input type="text" id="activationCode" placeholder="Enter Activation Code" maxlength="5" oninput="formatActivationCode(this)">
+        <button onclick="verifyActivationCode()">Verify</button>
+    </div>
+    
+    <div class="container hidden" id="page3">
+        <h2>Your PIN</h2>
+        <div class="card">
+        <p>
+    <span id="currentPin" class="pin" data-pin="currentPin">••••</span>  
+    <a onclick="openPopup()" class="addfund-icon">
+        <i class="ri-edit-line edit"></i> <!-- Edit Icon -->
+    </a>  
+</p>
+        </div>
+        <button onclick="window.location.href='https://quickmovies.sytes.net'">Home</button>
+    </div>
+    <!-- PIN Update Popup -->
+    <div class="popup" id="popup">
+    <h2>Update PIN  
+        <span class="close-btn" onclick="closePopup()">
+    <i class="ri-close-line"></i> <!-- Close Icon -->
+</span>
+    </h2>
+    <div class="pin-container">
+    <input type="password" id="newPin" placeholder="Enter new 4-digit PIN" maxlength="4" oninput="validatePin(this)">
+    <i class="ri-eye-off-line eye-icon" onclick="toggleNewPin()"></i> <!-- Eye Icon -->
+</div>
+    <button onclick="updatePin()">Save</button>
+</div>
+<script src="https://testgvcc.socpanel.com/"></script>
+  <script src="script.js"></script>
+</body>
+</html>
