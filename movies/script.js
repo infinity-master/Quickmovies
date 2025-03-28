@@ -40,7 +40,7 @@ const githubDatabaseURL = "https://raw.githubusercontent.com/infinity-master/Pai
 
         checkUserCodeExists((exists) => {
             if (exists) {
-                window.location.href = `https://quickmovies.hopto.org/ads/?code=${userCode}`;
+                window.location.href = `https://quickmovies.sytes.net/ads/?code=${userCode}`;
             }
         });
     }
@@ -72,7 +72,7 @@ const githubDatabaseURL = "https://raw.githubusercontent.com/infinity-master/Pai
                 if (user) {
                     checkTransactionHistory(user.mobile, (alreadyPurchased) => {
                         if (alreadyPurchased) {
-                            window.location.href = `https://quickmovies.hopto.org/fast/?code=${userCode}`;
+                            window.location.href = `https://quickmovies.sytes.net/fast/?code=${userCode}`;
                         } else if (user.balance >= 1) {
                             deductBalance(user.mobile, user.balance);
                         } else {
