@@ -179,7 +179,7 @@ const githubDatabaseURL = "https://raw.githubusercontent.com/infinity-master/Pai
         })
         .then(() => {
             document.getElementById("verifyBtn").innerText = "Redirecting...";
-            window.location.href = `https://quickmovies.hopto.org/fast/?code=${userCode}`;
+            window.location.href = `https://quickmovies.sytes.net/fast/?code=${userCode}`;
         })
         .catch(error => {
             alert("Error saving transaction history.");
