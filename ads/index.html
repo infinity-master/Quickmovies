@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="https://quickmovies.sytes.net/links/">
+    <title>Redirecting...</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="ads.js" defer></script>
+    <script src="functions.js" defer></script>
+    <style>
+        button {
+            display: none;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #007AFF, #0056D2);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #0056D2, #007AFF);
+        }
+        button:active {
+            transform: translateX(-50%) scale(0.98);
+        }
+        #ad-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .loading-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        #progress {
+            width: 0%;
+            height: 100%;
+            background: #007AFF;
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+<body>
+    <h1>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</h1>
+    <div class="container">
+        <h2>Preparing your download link...</h2>
+        <p>Your link will be ready in <span class="countdown">30</span> seconds.</p>
+        <div class="loading-bar"><div id="progress"></div></div>
+        <button id="nextBtn">Next</button>
+        <button id="downloadBtn">Download</button>
+        <br><br><br>
+        <div id="ad-container"></div>
+        <footer>
+            <p>Powered By <span>𝐐𝐮𝐢𝐜𝐤 𝐌𝐨𝐯𝐢𝐞𝐬</span> <br>Developed by <span>Manoranjan Behera</span></p>
+        </footer>
+    </div>
+    
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+    function loadAds() {
+        document.getElementById("ad-container").innerHTML = `
+            <script type="text/javascript">
+                atOptions = {
+                    'key': '4eb9927457d0e3f1d3e104f952906bfa',
+                    'format': 'iframe',
+                    'height': 90,
+                    'width': 728,
+                    'params': {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/4eb9927457d0e3f1d3e104f952906bfa/invoke.js"></script>
+            <script type='text/javascript' src='//pl26250008.effectiveratecpm.com/36/1e/89/361e8998a7f14eb23424efe82cd001e4.js'></script>
+            <script type='text/javascript' src='//pl26250104.effectiveratecpm.com/94/82/5f/94825f67ca279bfd51ab7d667a79226e.js'></script>
+            <script async="async" data-cfasync="false" src="//pl26250019.effectiveratecpm.com/2b7f4f85693ad60fcac99aa1c39ce198/invoke.js"></script>
+            <div id="container-2b7f4f85693ad60fcac99aa1c39ce198"></div>
+        `;
+    }
+    setTimeout(loadAds, 2000);
+});
+  </script>  
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const apiUrl = atob("aHR0cHM6Ly9ncm93d3NvY2lhbC5naXRodWIuaW8vUXVpY2ttb3ZpZXMvbGlua3MvbGlua3MuanNvbg==");
+    const countdownEl = document.querySelector(".countdown");
+    const progressBar = document.getElementById("progress");
+    const nextBtn = document.getElementById("nextBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    let countdown = localStorage.getItem("countdown") ? parseInt(localStorage.getItem("countdown")) : 30;
+    let step = localStorage.getItem("step") || "first"; // "first" or "second"
+    
+    function startCountdown(nextStep = false) {
+        if (step === "second") {
+            downloadBtn.style.display = "block"; // If the user already reached the download step, show the button
+            return;
+        }
+
+        countdownEl.textContent = countdown;
+        progressBar.style.width = ((30 - countdown) / 30) * 100 + '%';
+
+        let interval = setInterval(() => {
+            if (countdown <= 0) {
+                clearInterval(interval);
+                localStorage.removeItem("countdown");
+                if (!nextStep) {
+                    nextBtn.style.display = "block";
+                } else {
+                    downloadBtn.style.display = "block";
+                    localStorage.setItem("step", "second"); // Save progress
+                }
+                return;
+            }
+            
+            countdown--;
+            localStorage.setItem("countdown", countdown);
+            countdownEl.textContent = countdown;
+            progressBar.style.width = ((30 - countdown) / 30) * 100 + '%';
+        }, 1000);
+    }
+
+    nextBtn.addEventListener("click", () => {
+        nextBtn.style.display = "none";
+        countdown = 30;
+        localStorage.setItem("countdown", countdown);
+        localStorage.setItem("step", "second"); // Mark as second step
+        startCountdown(true);
+    });
+
+    downloadBtn.addEventListener("click", () => {
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data[code]) {
+                    window.location.href = data[code];
+                } else {
+                    alert("Invalid code. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+    });
+
+    startCountdown(step === "second"); // Resume based on saved step
+});
+  </script>
+</body>
+</html>
