@@ -99,18 +99,17 @@
     const downloadBtn = document.getElementById("downloadBtn");
 
     let countdown = localStorage.getItem("countdown") ? parseInt(localStorage.getItem("countdown")) : 30;
-    let step = localStorage.getItem("step") || "first"; // "first" or "second"
-    
-    function startCountdown(nextStep = false) {
-        if (step === "second") {
-            downloadBtn.style.display = "block"; // If the user already reached the download step, show the button
-            return;
-        }
 
+    function startCountdown(nextStep = false) {
         countdownEl.textContent = countdown;
         progressBar.style.width = ((30 - countdown) / 30) * 100 + '%';
 
         let interval = setInterval(() => {
+            countdown--;
+            localStorage.setItem("countdown", countdown);
+            countdownEl.textContent = countdown;
+            progressBar.style.width = ((30 - countdown) / 30) * 100 + '%';
+
             if (countdown <= 0) {
                 clearInterval(interval);
                 localStorage.removeItem("countdown");
@@ -118,15 +117,8 @@
                     nextBtn.style.display = "block";
                 } else {
                     downloadBtn.style.display = "block";
-                    localStorage.setItem("step", "second"); // Save progress
                 }
-                return;
             }
-            
-            countdown--;
-            localStorage.setItem("countdown", countdown);
-            countdownEl.textContent = countdown;
-            progressBar.style.width = ((30 - countdown) / 30) * 100 + '%';
         }, 1000);
     }
 
@@ -134,7 +126,6 @@
         nextBtn.style.display = "none";
         countdown = 30;
         localStorage.setItem("countdown", countdown);
-        localStorage.setItem("step", "second"); // Mark as second step
         startCountdown(true);
     });
 
@@ -153,7 +144,7 @@
             });
     });
 
-    startCountdown(step === "second"); // Resume based on saved step
+    startCountdown();
 });
   </script>
 </body>
